@@ -17,8 +17,13 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('user_name', $request->user_name)->first();
+        dd($user);
+        
+        if (Hash::check($request->password, $user->password)) {
+            dd('oke');
+        }
 
-        if (!$user || Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check('rahasia', $user->password)) {
             throw ValidationException::withMessages(
                 [
                     'message' => 'The provided credentials are incorrect'
@@ -26,7 +31,8 @@ class AuthController extends Controller
             );
         }
 
-        return $user->createToken('user login')->plainTextToken;
+
+        // return $user->createToken('user login')->plainTextToken;
     }
 
     public function logout(Request $request)
