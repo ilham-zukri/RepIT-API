@@ -20,7 +20,7 @@ class AuthController extends Controller
 
         //Check password hash
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Credentials not match.'], 401);
+            return response()->json(['error' => 'Credentials does not match.'], 401);
         }
 
         return $user->createToken('user login')->plainTextToken;
