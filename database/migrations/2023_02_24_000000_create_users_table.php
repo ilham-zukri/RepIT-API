@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('user_name');
+            $table->string('user_name')->unique();
             $table->string('password');
             $table->unsignedBigInteger('role_id');
             $table->string('employee_id', 100)->nullable();
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('role_id')->references('id')->on('roles');
         });
