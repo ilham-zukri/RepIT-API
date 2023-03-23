@@ -18,6 +18,7 @@ return new class extends Migration
             $table->boolean('asset_approval');
             $table->boolean('knowledge_base');
             $table->boolean('user_management');
+            $table->boolean('asset_purchasing')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

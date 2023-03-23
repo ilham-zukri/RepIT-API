@@ -26,5 +26,4 @@ class UserResource extends JsonResource
             'department' => $this->departmen
         ];
     }
-    public static $wrap = 'users';
 }

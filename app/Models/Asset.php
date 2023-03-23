@@ -12,18 +12,17 @@ class Asset extends Model
 
     protected $fillable = [
         'owner_id',
-        'm_type',
-        's_type',
+        'asset_type',
         'brand',
+        'model',
+        'serial_number',
         'cpu',
         'ram',
         'utilization',
         'location_id',
-        'purchased_at',
-        'price',
         'deployed_at',
-        'warranty_end',
         'status',
+        'purchase_id',
         'scrapped_at',
     ];
 
@@ -45,5 +44,15 @@ class Asset extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
+    }
+
+    /**
+     * Get the user that owns the Asset
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function purchaseData(): BelongsTo
+    {
+        return $this->belongsTo(Purchase::class, 'purchase_id', 'id');
     }
 }

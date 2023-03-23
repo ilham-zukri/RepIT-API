@@ -28,9 +28,9 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken->delete();
+        $request->user()->tokens()->delete();
 
-        return "Berhasil Logout";
+        // return response()->json(200);
     }
 
     public function getCurrentUser(Request $request)

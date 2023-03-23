@@ -13,6 +13,6 @@ class UserController extends Controller
     {
         $currentUser = Auth::user();
         $users = User::with('role:id,role_name,asset_request,asset_approval,knowledge_base,user_management')->get();
-        return ($currentUser->role->user_management) ? ['users' => UserResource::collection($users->loadMissing(['role:id,role_name,asset_request,asset_approval,knowledge_base,user_management']))] : response()->json(['message' => 'unauthorized'], 401);
+        return ($currentUser->role->user_management) ? ['users' => UserResource::collection($users)] : response()->json(['message' => 'unauthorized'], 401);
     }
 }
