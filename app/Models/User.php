@@ -61,7 +61,7 @@ class User extends Authenticatable
      */
     public function requests(): HasMany
     {
-        return $this->hasMany(Purchase::class, 'requested_by', 'id');
+        return $this->hasMany(Request::class, 'requester_id', 'id');
     }
 
     /**
