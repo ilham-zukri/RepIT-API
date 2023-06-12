@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'employee_id' => $this->employee_id,
             'full_name' => $this->full_name,
             'email' => $this->email,
-            'branch' => $this->branch,
+            'branch' => $this->branch->name,
             'department' => $this->departmen
         ];
     }

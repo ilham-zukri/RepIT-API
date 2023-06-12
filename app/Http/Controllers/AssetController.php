@@ -12,6 +12,12 @@ class AssetController extends Controller
     public function myAssets()
     {
         $assets = Asset::where('owner_id', auth()->user()->id)->get();
+
+        if($assets->isEmpty()){
+            return response()->json([],204);
+        }
+
         return ['assets' => [AssetResource::collection($assets->loadMissing(['location:id,name']))]];
     }
 }
+ 

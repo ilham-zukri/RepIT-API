@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('owner_id')->nullable();
+            $table->string('owner_id', 100)->nullable();
             $table->string('asset_type', 50);
             $table->string('brand', 50);
             $table->string('model', 100)->nullable();

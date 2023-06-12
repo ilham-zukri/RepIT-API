@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PurchasesDetail extends Model
 {
     use HasFactory;
+    private $table = "purchases_items";
+    
     protected $fillable = [
         'asset_type',
         'brand',
@@ -25,7 +27,7 @@ class PurchasesDetail extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function items(): BelongsTo
+    public function purchase(): BelongsTo
     {
         return $this->belongsTo(Purchase::class, 'purchase_id', 'id');
     }

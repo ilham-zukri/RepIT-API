@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('purchased_by');
+            $table->string('purchased_by', 150);
             $table->date('purchased_at')->nullable();
             $table->string('purchased_from', 100);
             $table->bigInteger('total_price')->default(0);
-            $table->unsignedBigInteger('requested_by');
+            $table->string('requested_by', 100);
             $table->softDeletes();
             $table->timestamps();
 

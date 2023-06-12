@@ -8,10 +8,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+    public $incrementing = false;    
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -24,7 +28,7 @@ class User extends Authenticatable
         'password',
         'employee_id',
         'full_name',
-        'branch',
+        'branch_id',
         'department',
         'role_id',
         'active'
@@ -38,6 +42,36 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
+    }
+
+    /**
+     * Get all of the purchases for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(Purchase::class, 'purchased_by', 'id');
+    }
+
+    /**
+     * Get all of the requests for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function requests(): HasMany
+    {
+        return $this->hasMany(Purchase::class, 'requested_by', 'id');
+    }
+
+    /**
+     * Get the branch that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'branch_id', 'id');
     }
 
     /**
@@ -58,4 +92,13 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->{$model->getKeyName()} = (string) Str::uuid();
+        });
+    }
 }
