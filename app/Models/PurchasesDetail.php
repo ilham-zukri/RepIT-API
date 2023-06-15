@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PurchasesDetail extends Model
 {
     use HasFactory;
-    private $table = "purchases_items";
+    protected $table = "purchases_items";
     
     protected $fillable = [
         'asset_type',

@@ -13,9 +13,9 @@ class Purchase extends Model
     protected $fillable = [
         'purchased_by',
         'purchased_at',
-        'puruchased_from',
+        'purchased_from',
         'total_price',
-        'requested_by',
+        'requested_id',
     ];
 
     /**
@@ -33,9 +33,9 @@ class Purchase extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function requester(): BelongsTo
+    public function request(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'requested_by', 'id');
+        return $this->belongsTo(Request::class, 'requested_id', 'id');
     }
 
     /**
@@ -46,5 +46,15 @@ class Purchase extends Model
     public function items(): HasMany
     {
         return $this->hasMany(PurchasesDetail::class, 'purchase_id', 'id');
+    }
+
+    /**
+     * Get all of the assets for the Purchase
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class, 'purchase_id', 'id');
     }
 }

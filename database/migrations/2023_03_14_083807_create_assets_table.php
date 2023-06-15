@@ -24,7 +24,7 @@ return new class extends Migration
             $table->unsignedBigInteger('location_id')->nullable();
             $table->date('deployed_at')->nullable();
             $table->string('status', 50)->nullable();
-            $table->unsignedBigInteger('purchase_id');
+            $table->unsignedBigInteger('purchase_id')->nullable();
             $table->date('scrapped_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

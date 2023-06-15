@@ -57,7 +57,7 @@ class AuthController extends Controller
             'department' => $request->department,
         ]);
 
-        return response()->json(['message' => 'user created', 'user' => $user], 201);
+        return response()->json(['message' => 'user created'], 201);
     }
 
     public function getCurrentUser(Request $request)

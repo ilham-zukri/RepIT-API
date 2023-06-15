@@ -4,64 +4,46 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\PurchaseResource;
 use App\Models\Purchase;
+use App\Models\Request as AssetRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function getPurchases()
-    {
-        $purchases = Purchase::with('items:id,asset_type,brand,model,amount,price_ea,total_price,warranty_end,purchase_id')->get();
-        return PurchaseResource::collection($purchases);
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function makePurchaseFromRequest(Request $request)
     {
-        //
-    }
+        $user = User::where('id', auth()->user()->id)->first();
+        $access = $user->role->asset_purchasing;
+        if (!$access) return response()->json(['message' => 'unauthorized'], 401);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $request->validate([
+            'request_id' => 'required|integer',
+            'purchased_from' => 'required|string',
+            'items' => 'required|array'
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Purchase $purchase)
-    {
-        //
-    }
+        $assetRequest = AssetRequest::where('id', $request->request_id)->first();
+        if($assetRequest->status != 'Approved') return response()->json(['message' => 'has not approved yet'], 401);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Purchase $purchase)
-    {
-        //
-    }
+        $purchase = $assetRequest->purchases()->create([
+            'purchased_by' => $user->id,
+            'purchased_from' => $request->purchased_from,
+        ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Purchase $purchase)
-    {
-        //
-    }
+        $items = $request->items;
+        $totalPrice = 0;
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Purchase $purchase)
-    {
-        //
+        foreach ($items as $item){
+            $purchase_item = $purchase->items()->create($item);
+            $totalPrice += $purchase_item->total_price;
+        }
+
+        $purchase->update(['total_price' => $totalPrice,]);
+        $assetRequest->update([
+            'status' => 'Preparation'
+        ]);
+
+        return response()->json(['message' => 'created'], 201);
     }
 }
