@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\AssetResource;
-use App\Http\Resources\UserResource;
 use App\Models\Asset;
 use App\Models\Purchase;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AssetController extends Controller
@@ -70,5 +70,11 @@ class AssetController extends Controller
         }
 
         return response()->json(['message' => 'Data Aset Telah Dibuat'], 201);
+    }
+
+    public function myAssets(){
+        $user = User::where('id', auth()->user()->id)->first();
+        $assets = $user->assets;
+        return ['assets' => AssetResource::collection($assets)];
     }
 }

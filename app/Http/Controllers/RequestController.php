@@ -12,6 +12,10 @@ class RequestController extends Controller
 
         $user = User::where('id', auth()->user()->id)->first();
 
+        $access = $user->role->asset_request;
+
+        if(!$access) return response()->json(['message' => 'tidak berwenang'], 401);
+
         $assetRequest = $user->requests()->create([
             'status' => 'Requested',
             'description' => $request->description,

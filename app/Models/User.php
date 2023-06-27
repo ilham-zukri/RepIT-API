@@ -75,6 +75,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all of the assets for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function assets(): HasMany
+    {
+        return $this->hasMany(Asset::class, 'owner_id', 'id');
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>

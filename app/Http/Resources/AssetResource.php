@@ -16,15 +16,15 @@ class AssetResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'owner_id' => $this->owner_id,
             'asset_type' => $this->asset_type,
             'brand' => $this->brand,
             'model' => $this->model,
             'serial_number' => $this->serial_number,
             'cpu' => $this->cpu,
             'ram' => $this->ram,
-            // 'location_id'=> $this->location_id,
-            'location' => $this->whenLoaded('location')
+            'utilization' => $this->utilization,
+            'location' => $this->location->name,
+            'status' => $this->status
         ];
     }
 }
