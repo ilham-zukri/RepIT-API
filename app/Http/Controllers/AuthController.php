@@ -62,7 +62,8 @@ class AuthController extends Controller
 
     public function getCurrentUser(Request $request)
     {
-        return response()->json(['current_user' => auth()->user()]);
+        $user = User::where('id', auth()->user()->id)->first();
+        return new UserResource($user);
     }
 
     public function getUsers()

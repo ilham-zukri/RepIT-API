@@ -17,8 +17,15 @@ class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'user_name' => $this->user_name,
-            'role_id' => $this->role_id,
-            'role' => $this->whenLoaded('role'),
+            'role' => [
+                'role_name' => $this->role->role_name,
+                'asset_request' => $this->role->asset_request,
+                'asset_approval' => $this->role->asset_approval,
+                'knowledge_base' => $this->role->knowledge_base,
+                'user_management' => $this->role->user_management,
+                'asset_purchasing' => $this->role->asset_purchasing,
+                'asset_management' => $this->role->asset_management
+            ],
             'employee_id' => $this->employee_id,
             'full_name' => $this->full_name,
             'email' => $this->email,
