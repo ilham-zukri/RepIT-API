@@ -38,8 +38,8 @@ class AuthController extends Controller
     public function addUser(Request $request)
     {
         $access = auth()->user()->role->user_management;
-        $existed = User::where('user_name', $request->user_name);
-        if (!$access) return response()->json(['message' => 'unauthorized'], 401);
+        $existed = User::where('user_name', $request->user_name)->first();
+        if (!$access) return response()->json(['message' => 'forbidden'], 403);
         if ($existed) return response()->json(['message' => 'username tidak tersedia'], 409);
 
         $request->validate([
@@ -49,13 +49,10 @@ class AuthController extends Controller
             'department' => 'required|string',
         ]);
 
-        $user = User::create([
-            'user_name' => $request->user_name,
-            'password' => Hash::make($request->password),
-            'role_id' => $request->role_id ?? 3, //default value is 3, which is User
-            'branch_id' => $request->branch_id,
-            'department' => $request->department,
-        ]);
+        $_request  = $request->all();
+        $_request['password'] = Hash::make($request->password); 
+
+        User::create($_request);
 
         return response()->json(['message' => 'user created'], 201);
     }
@@ -68,7 +65,6 @@ class AuthController extends Controller
 
     public function getUsers()
     {
-
         $currentUser = Auth::user();
         $users = User::with('role:id,role_name,asset_request,asset_approval,knowledge_base,user_management')->get();
         return ($currentUser->role->user_management) ? ['users' => UserResource::collection($users)] : response()->json(['message' => 'unauthorized'], 401);

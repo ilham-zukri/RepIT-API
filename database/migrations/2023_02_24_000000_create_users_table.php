@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('user_name')->unique();
             $table->string('password');
-            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('role_id')->default(3);
             $table->string('employee_id', 100)->nullable();
             $table->string('full_name', 100)->nullable();
             $table->string('email')->nullable()->unique();
@@ -26,8 +26,8 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             
-            $table->foreign('branch_id')->references('id')->on('locations');
-            $table->foreign('role_id')->references('id')->on('roles');
+            $table->foreign('branch_id')->references('id')->on('locations')->onDelete('cascade');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
         });
     }
 
