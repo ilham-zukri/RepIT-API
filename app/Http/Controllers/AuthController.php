@@ -18,11 +18,11 @@ class AuthController extends Controller
             'password' => 'required'
         ]);
 
-        $user = User::where('user_name', $request->user_name)->first();
+        $user = User::where('user_name', strtolower($request->user_name))->first();
 
         //Check password hash
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['error' => 'Credentials does not match.'], 401);
+            return response()->json(['message' => 'Credentials does not match.'], 401);
         }
 
         return $user->createToken('user login')->plainTextToken;
@@ -51,10 +51,28 @@ class AuthController extends Controller
 
         $_request  = $request->all();
         $_request['password'] = Hash::make($request->password); 
+        $_request['user_name'] = strtolower($request->user_name);
 
         User::create($_request);
 
         return response()->json(['message' => 'user created'], 201);
+    }
+
+    public function changeUname(Request $request) {
+        $user = User::whereId(auth()->user()->id)->firstOrFail();
+
+        $request->validate([
+            'user_name' => 'required|string'
+        ]);
+
+        $existed = User::whereUserName($request->user_name)->first();
+        if($existed) return response()->json(['message' => 'username sudah digunakan'], 409); 
+
+        $user->update([
+            'user_name' => strtolower($request->user_name)
+        ]);
+
+        return response()->json(['message' => 'berhasil'], 200);
     }
 
     public function getCurrentUser(Request $request)
