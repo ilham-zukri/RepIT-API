@@ -16,10 +16,16 @@ class RequestController extends Controller
 
         if(!$access) return response()->json(['message' => 'tidak berwenang'], 401);
 
+        if($request->for_user){
+            $forUser = User::whereId($request->for_user)->select('id')->first();
+            if(!$forUser) return response()->json(['message' => 'user tidak ditemukan'], 404);
+        }
+
         $assetRequest = $user->requests()->create([
             'status' => 'Requested',
             'description' => $request->description,
-            'priority' => $request->priority ?? 'Low'
+            'priority' => $request->priority ?? 'Low',
+            'for_user' => $request->for_user ?? auth()->user()->id
         ]);
 
         return response()->json($assetRequest, 201);
