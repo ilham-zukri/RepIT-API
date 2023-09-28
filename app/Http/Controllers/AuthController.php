@@ -112,8 +112,15 @@ class AuthController extends Controller
         $access = (auth()->user()->role->asset_request);
         if(!$access) return response()->json(['message' => 'tidak berwenang'], 403);
 
-        $users = User::whereDepartment(auth()->user()->department)->get();
+        $users = User::whereDepartment(auth()->user()->department)->select('id', 'user_name')->get();
+        $loggedIn = User::whereId(auth()->user()->id)->select('id', 'user_name')->first();
+        
+        $users = $users->filter(function ($user) use ($loggedIn) {
+            return $user->id !== $loggedIn->id;
+        });
 
-        return UserByDeptResource::collection($users);
+        $users->prepend($loggedIn);
+
+        return response()->json(['data' => $users], 200);
     }
 }

@@ -10,7 +10,6 @@ class LocationController extends Controller
 {
     public function getLocations() : JsonResponse {
         $locations = Location::select('id','name')->get();
-
         return response()->json($locations, 200);
     }
 }
