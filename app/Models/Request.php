@@ -16,7 +16,8 @@ class Request extends Model
         'status',
         'description',
         'priority',
-        'for_user'
+        'for_user',
+        'location_id'
     ];
 
     /**

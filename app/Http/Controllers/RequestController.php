@@ -25,7 +25,8 @@ class RequestController extends Controller
             'status' => 'Requested',
             'description' => $request->description,
             'priority' => $request->priority ?? 'Low',
-            'for_user' => $request->for_user ?? auth()->user()->id
+            'for_user' => $request->for_user ?? auth()->user()->id,
+            'location_id' => $request->location_id ?? 1
         ]);
 
         return response()->json($assetRequest, 201);
