@@ -21,15 +21,16 @@ class RequestController extends Controller
             if(!$forUser) return response()->json(['message' => 'user tidak ditemukan'], 404);
         }
 
-        $assetRequest = $user->requests()->create([
+        $user->requests()->create([
             'status' => 'Requested',
+            'title' => $request->title,
             'description' => $request->description,
             'priority' => $request->priority ?? 'Low',
             'for_user' => $request->for_user ?? auth()->user()->id,
             'location_id' => $request->location_id ?? 1
         ]);
 
-        return response()->json($assetRequest, 201);
+        return response()->json(['message' => 'berhasil'], 201);
     }
 
     public function approveRequest(Request $request) 

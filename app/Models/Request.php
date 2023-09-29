@@ -14,6 +14,7 @@ class Request extends Model
     protected $fillable =[
         'requester_id',
         'status',
+        'title',
         'description',
         'priority',
         'for_user',
