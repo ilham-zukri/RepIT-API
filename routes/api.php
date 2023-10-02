@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/purchase/create', [PurchaseController::class, 'makePurchaseFromRequest']);
 
     Route::get('/asset/myAssets', [AssetController::class, 'myAssets']);
+    Route::put('/asset/accept', [AssetController::class, 'acceptAsset']);
     Route::get('/purchase', [PurchaseController::class, 'getPurchases']);
 
     Route::get('/locations', [LocationController::class, 'getLocations']);

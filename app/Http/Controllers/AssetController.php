@@ -6,6 +6,7 @@ use App\Http\Resources\AssetResource;
 use App\Models\Asset;
 use App\Models\Purchase;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AssetController extends Controller
@@ -35,6 +36,7 @@ class AssetController extends Controller
                 'location_id' => $request->location_id,
                 'status' => 'Ready',
             ]);
+            
         } else {
 
             $purchase = Purchase::with('items')->find($request->purchase_id);
@@ -76,5 +78,25 @@ class AssetController extends Controller
         $user = User::where('id', auth()->user()->id)->first();
         $assets = $user->assets;
         return ['assets' => AssetResource::collection($assets)];
+    }
+
+    function acceptAsset(Request $request) : JsonResponse{
+        $request->validate([
+            'asset_id' => 'required|integer'
+        ]);
+
+        $user = User::whereId(auth()->user()->id)->select('id')->first();
+        
+        $asset = Asset::whereId($request->asset_id)->first();
+        if(!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+        if($asset->status != 'Ready' || 'On Repair') return response()->json(['message'=>'Asset Sudah di deploy'], 400);
+
+        if($user->id != $asset->owner_id) return response()->json(['message'=> 'forbidden'], 403);
+
+        $asset->update([
+            'status' => 'Deployed',
+            'deployed_at' => date('Y-m-d')  
+        ]);
+        return response()->json(['message' => 'Berhasil'], 200);
     }
 }
