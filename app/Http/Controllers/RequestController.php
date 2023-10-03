@@ -14,7 +14,7 @@ class RequestController extends Controller
 
         $access = $user->role->asset_request;
 
-        if(!$access) return response()->json(['message' => 'tidak berwenang'], 401);
+        if(!$access) return response()->json(['message' => 'tidak berwenang'], 403);
 
         if($request->for_user){
             $forUser = User::whereId($request->for_user)->select('id')->first();
@@ -36,16 +36,26 @@ class RequestController extends Controller
     public function approveRequest(Request $request) 
     {
         $access = auth()->user()->role->asset_approval;
-        if (!$access) return response()->json(['message' => 'unauthorized'], 401);
+        if (!$access) return response()->json(['message' => 'forbidden'], 403);
 
         $assetRequest = AssetRequest::where('id', $request->request_id)->first();
 
         $status = ($request->approved) ? 'Approved' : 'Declined';
         
         $assetRequest->update([
-            'status' => $status
+            'status' => $status,
+            'approved_at' => date('Y-m-d')
         ]);
 
         return response()->json(['message' => 'berhasil'], 200);
+    }
+
+    public function getRequests() {
+        $access = auth()->user()->role->asset_management;
+        if (!$access) return response()->json(['message' => 'Forbidden'], 403);
+
+        $assetRequests = AssetRequest::paginate(10);
+
+        return response()->json([$assetRequests], 200);
     }
 }

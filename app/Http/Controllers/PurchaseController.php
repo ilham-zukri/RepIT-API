@@ -24,7 +24,7 @@ class PurchaseController extends Controller
         ]);
 
         $assetRequest = AssetRequest::where('id', $request->request_id)->first();
-        if($assetRequest->status != 'Approved') return response()->json(['message' => 'has not approved yet'], 401);
+        if($assetRequest->status != 'Approved') return response()->json(['message' => 'Request Belum disetujui'], 401);
 
         $purchase = $assetRequest->purchases()->create([
             'purchased_by' => $user->id,

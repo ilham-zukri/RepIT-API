@@ -20,6 +20,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/request/create', [RequestController::class, 'makeRequest']);
     Route::put('/request/approve', [RequestController::class, 'approveRequest']);
+    Route::get('/requests', [RequestController::class, 'getRequests']);
 
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);
     

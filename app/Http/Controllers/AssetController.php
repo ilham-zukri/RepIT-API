@@ -36,7 +36,6 @@ class AssetController extends Controller
                 'location_id' => $request->location_id,
                 'status' => 'Ready',
             ]);
-            
         } else {
 
             $purchase = Purchase::with('items')->find($request->purchase_id);
@@ -54,7 +53,7 @@ class AssetController extends Controller
             $assetModelCount = $purchase->assets->where('model', $request->model)->count();
             $purchaseModelCount = $purchase->items->where('model', $request->model)->first()->amount;
 
-           if($assetModelCount >= $purchaseModelCount) return response()->json(['message'=>'Jumlah Aset dengan Model tersebut sudah melebihi jumlah pembelian'], 400);
+            if ($assetModelCount >= $purchaseModelCount) return response()->json(['message' => 'Jumlah Aset dengan Model tersebut sudah melebihi jumlah pembelian'], 400);
 
             Asset::create([
                 'purchase_id' => $request->purchase_id,
@@ -74,29 +73,37 @@ class AssetController extends Controller
         return response()->json(['message' => 'Data Aset Telah Dibuat'], 201);
     }
 
-    public function myAssets(){
+    public function myAssets()
+    {
         $user = User::where('id', auth()->user()->id)->first();
         $assets = $user->assets;
         return ['assets' => AssetResource::collection($assets)];
     }
 
-    function acceptAsset(Request $request) : JsonResponse{
+    function acceptAsset(Request $request): JsonResponse
+    {
         $request->validate([
             'asset_id' => 'required|integer'
         ]);
 
         $user = User::whereId(auth()->user()->id)->select('id')->first();
-        
-        $asset = Asset::whereId($request->asset_id)->first();
-        if(!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
-        if($asset->status != 'Ready' || 'On Repair') return response()->json(['message'=>'Asset Sudah di deploy'], 400);
 
-        if($user->id != $asset->owner_id) return response()->json(['message'=> 'forbidden'], 403);
+        $asset = Asset::whereId($request->asset_id)->first();
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+        if ($asset->status != 'Ready') return response()->json(['message' => 'Asset Sudah di deploy'], 400);
+
+        if ($user->id != $asset->owner_id) return response()->json(['message' => 'forbidden'], 403);
 
         $asset->update([
             'status' => 'Deployed',
-            'deployed_at' => date('Y-m-d')  
+            'deployed_at' => date('Y-m-d')
         ]);
-        return response()->json(['message' => 'Berhasil'], 200);
+        return response()->json(
+            [
+                'message' => 'Berhasil',
+                'status' => $asset->status
+            ],
+            200
+        );
     }
 }
