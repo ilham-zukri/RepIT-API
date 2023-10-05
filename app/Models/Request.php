@@ -16,7 +16,7 @@ class Request extends Model
         'status',
         'title',
         'description',
-        'priority',
+        'priority_id',
         'for_user',
         'location_id',
         'approved_at'
@@ -40,5 +40,35 @@ class Request extends Model
     public function purchases(): HasMany
     {
         return $this->hasMany(Purchase::class, 'request_id', 'id');
+    }
+
+    /**
+     * Get the priority that owns the Request
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function priority(): BelongsTo
+    {
+        return $this->belongsTo(Priority::class, 'priority_id', 'id');
+    }
+
+    /**
+     * Get the forUser that owns the Request
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function forUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'for_user', 'id');
+    }
+    
+    /**
+     * Get the location that owns the Request
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'location_id', 'id');
     }
 }

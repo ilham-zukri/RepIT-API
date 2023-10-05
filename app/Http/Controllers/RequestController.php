@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RequestListResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Request as AssetRequest;
@@ -54,8 +55,10 @@ class RequestController extends Controller
         $access = auth()->user()->role->asset_management;
         if (!$access) return response()->json(['message' => 'Forbidden'], 403);
 
-        $assetRequests = AssetRequest::orderByDesc('priority_id')->paginate(10);
+        $assetRequests = AssetRequest::orderBy('priority_id', 'asc')->simplePaginate(10);
 
-        return response()->json([$assetRequests], 200);
+        // return response()->json([$assetRequests], 200);
+
+        return RequestListResource::collection($assetRequests);
     }
 }
