@@ -54,7 +54,7 @@ class RequestController extends Controller
         $access = auth()->user()->role->asset_management;
         if (!$access) return response()->json(['message' => 'Forbidden'], 403);
 
-        $assetRequests = AssetRequest::paginate(10);
+        $assetRequests = AssetRequest::orderByDesc('priority_id')->paginate(10);
 
         return response()->json([$assetRequests], 200);
     }
