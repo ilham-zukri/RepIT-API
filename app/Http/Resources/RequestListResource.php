@@ -23,7 +23,7 @@ class RequestListResource extends JsonResource
             'priority' => $this->priority->priority,
             'for_user' => $this->forUser->full_name ?? $this->forUser->user_name,
             'location' => $this->location->name,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->format('d-m-Y'),
             'approved_at' => $this->approved_at ?? '#N/A'
 
         ];
