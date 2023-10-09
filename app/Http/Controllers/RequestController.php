@@ -24,10 +24,9 @@ class RequestController extends Controller
         }
 
         $user->requests()->create([
-            'status' => 'Requested',
             'title' => $request->title,
             'description' => $request->description,
-            'priority' => $request->priority ?? 'Low',
+            'priority_id' => $request->priority ?? 4,
             'for_user' => $request->for_user ?? auth()->user()->id,
             'location_id' => $request->location_id ?? 1
         ]);
@@ -58,15 +57,28 @@ class RequestController extends Controller
         );
     }
 
-    public function getRequests()
+    public function getRequests(Request $request)
     {
         $access = auth()->user()->role->asset_management;
         if (!$access) return response()->json(['message' => 'Forbidden'], 403);
 
-        $assetRequests = AssetRequest::orderBy('priority_id', 'asc')->paginate(10);
+        $sPriority = ($request->query('priority_sort')) ? $request->query('priority_sort') : 'asc';
+        $sStatus = ($request->query('status_sort')) ? $request->query('status_sort') : 'asc';
+        $sCreatedAt = $request->query('created_at_sort');
+        $fLocation = $request->query('filter_location');
 
-        // return response()->json([$assetRequests], 200);
+        $assetRequestsQ = AssetRequest::orderBy('status_id', $sStatus)->orderBy('priority_id', $sPriority);
 
+        if ($sCreatedAt) {
+            $assetRequestsQ = AssetRequest::orderBy('created_at', $sCreatedAt)->orderBy('priority_id', $sPriority);
+        }
+
+        if($fLocation){
+            $assetRequestsQ = AssetRequest::whereLocationId($fLocation)->orderBy('created_at', 'desc') ->orderBy('priority_id', 'asc')->orderBy('status_id', 'asc');
+        }
+
+
+        $assetRequests = $assetRequestsQ->paginate(10);
         return RequestListResource::collection($assetRequests);
     }
 }
