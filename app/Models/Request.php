@@ -13,7 +13,7 @@ class Request extends Model
 
     protected $fillable =[
         'requester_id',
-        'status',
+        'status_id',
         'title',
         'description',
         'priority_id',
@@ -70,5 +70,15 @@ class Request extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class, 'location_id', 'id');
+    }
+
+    /**
+     * Get the status that owns the Request
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(RequestStatus::class, 'status_id', 'id');
     }
 }

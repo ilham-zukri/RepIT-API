@@ -17,7 +17,7 @@ class RequestListResource extends JsonResource
         return [
             'id' => $this->id,
             'requester'=> $this->requester->full_name ?? $this->requester->user_name,
-            'status' => $this->status,
+            'status' => $this->status->status,
             'title' => $this->title,
             'description' => $this->description,
             'priority' => $this->priority->priority,

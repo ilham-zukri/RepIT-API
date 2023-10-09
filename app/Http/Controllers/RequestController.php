@@ -9,17 +9,18 @@ use App\Models\Request as AssetRequest;
 
 class RequestController extends Controller
 {
-    public function makeRequest(Request $request){
+    public function makeRequest(Request $request)
+    {
 
         $user = User::where('id', auth()->user()->id)->first();
 
         $access = $user->role->asset_request;
 
-        if(!$access) return response()->json(['message' => 'tidak berwenang'], 403);
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
 
-        if($request->for_user){
+        if ($request->for_user) {
             $forUser = User::whereId($request->for_user)->select('id')->first();
-            if(!$forUser) return response()->json(['message' => 'user tidak ditemukan'], 404);
+            if (!$forUser) return response()->json(['message' => 'user tidak ditemukan'], 404);
         }
 
         $user->requests()->create([
@@ -34,24 +35,31 @@ class RequestController extends Controller
         return response()->json(['message' => 'berhasil'], 201);
     }
 
-    public function approveRequest(Request $request) 
+    public function approveRequest(Request $request)
     {
         $access = auth()->user()->role->asset_approval;
         if (!$access) return response()->json(['message' => 'forbidden'], 403);
 
         $assetRequest = AssetRequest::where('id', $request->request_id)->first();
 
-        $status = ($request->approved) ? 'Approved' : 'Declined';
-        
+        $statusId = ($request->approved) ? 2 : 5;
+
         $assetRequest->update([
-            'status' => $status,
+            'status_id' => $statusId,
             'approved_at' => date('Y-m-d')
         ]);
 
-        return response()->json(['message' => 'berhasil'], 200);
+        return response()->json(
+            [
+                'message' => 'Berhasil',
+                'status' => $assetRequest->status->status
+            ],
+            200
+        );
     }
 
-    public function getRequests() {
+    public function getRequests()
+    {
         $access = auth()->user()->role->asset_management;
         if (!$access) return response()->json(['message' => 'Forbidden'], 403);
 
