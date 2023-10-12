@@ -24,7 +24,8 @@ class PurchaseController extends Controller
         ]);
 
         $assetRequest = AssetRequest::where('id', $request->request_id)->first();
-        if($assetRequest->status != 'Approved') return response()->json(['message' => 'Request Belum disetujui'], 401);
+        if(!$assetRequest) return response()->json(['message' => 'Request tidak ditemukan'], 404); 
+        if($assetRequest->status->status != 'Approved') return response()->json(['message' => 'Request Belum disetujui'], 401);
 
         $purchase = $assetRequest->purchases()->create([
             'purchased_by' => $user->id,
@@ -41,9 +42,9 @@ class PurchaseController extends Controller
 
         $purchase->update(['total_price' => $totalPrice,]);
         $assetRequest->update([
-            'status' => 'Preparation'
+            'status_id' => 3
         ]);
 
-        return response()->json(['message' => 'created'], 201);
+        return response()->json(['message' => 'Purchase request terbuat'], 201);
     }
 }

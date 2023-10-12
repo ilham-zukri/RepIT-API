@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PurchaseController;
@@ -23,8 +24,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/requests', [RequestController::class, 'getRequests']);
 
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);
+    Route::get('/asset-type', [AssetTypeController::class, 'getAssetTypes']);
     
-    Route::post('/purchase/create', [PurchaseController::class, 'makePurchaseFromRequest']);
+    Route::post('/purchase', [PurchaseController::class, 'makePurchaseFromRequest']);
 
     Route::get('/asset/myAssets', [AssetController::class, 'myAssets']);
     Route::put('/asset/accept', [AssetController::class, 'acceptAsset']);

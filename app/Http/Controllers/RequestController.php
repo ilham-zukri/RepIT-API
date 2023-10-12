@@ -57,32 +57,40 @@ class RequestController extends Controller
         );
     }
 
-        public function getRequests(Request $request)
-        {
-            $access = auth()->user()->role->asset_management;
-            if (!$access) return response()->json(['message' => 'Forbidden'], 403);
+    public function getRequests(Request $request)
+    {
+        $access = auth()->user()->role->asset_approval;
 
-            $sPriority = ($request->query('priority_sort')) ? $request->query('priority_sort') : 'asc';
-            $sStatus = ($request->query('status_sort')) ? $request->query('status_sort') : 'asc';
-            $sCreatedAt = $request->query('created_at_sort');
-            $fLocation = $request->query('filter_location');
+        if (auth()->user()->role->asset_purchasing && !$access) {
+            $assetRequests = AssetRequest::where('status_id', '>', 1)->orderBy('status_id', 'asc')->orderBy('priority_id', "asc")->orderBy('created_at', 'desc')->paginate(10);
+            if (!$assetRequests->first()) return response()->json(['message' => 'Data tidak ditemukan'], 404);
 
-            $assetRequestsQ = AssetRequest::orderBy('status_id', $sStatus)->orderBy('priority_id', $sPriority);
-
-            if ($sCreatedAt) {
-                $assetRequestsQ = AssetRequest::orderBy('created_at', $sCreatedAt)->orderBy('priority_id', $sPriority);
-            }
-
-            if($fLocation){
-                $assetRequestsQ = AssetRequest::whereLocationId($fLocation)->orderBy('created_at', 'desc') ->orderBy('priority_id', 'asc')->orderBy('status_id', 'asc');
-            }
-
-
-            $assetRequests = $assetRequestsQ->paginate(10);
-            $existedData = ($assetRequests->first()) ? true : false;
-
-            if(!$existedData) return response()->json(['message' => 'Data tidak ditemukan'], 404);
-            
             return RequestListResource::collection($assetRequests);
         }
+
+        if (!$access) return response()->json(['message' => 'Forbidden'], 403);
+
+        $sPriority = ($request->query('priority_sort')) ? $request->query('priority_sort') : 'asc';
+        $sStatus = ($request->query('status_sort')) ? $request->query('status_sort') : 'asc';
+        $sCreatedAt = $request->query('created_at_sort');
+        $fLocation = $request->query('filter_location');
+
+        $assetRequestsQ = AssetRequest::orderBy('status_id', $sStatus)->orderBy('priority_id', $sPriority);
+
+        if ($sCreatedAt) {
+            $assetRequestsQ = AssetRequest::orderBy('created_at', $sCreatedAt)->orderBy('priority_id', $sPriority);
+        }
+
+        if ($fLocation) {
+            $assetRequestsQ = AssetRequest::whereLocationId($fLocation)->orderBy('created_at', 'desc')->orderBy('priority_id', 'asc')->orderBy('status_id', 'asc');
+        }
+
+
+        $assetRequests = $assetRequestsQ->paginate(10);
+        $existedData = ($assetRequests->first()) ? true : false;
+
+        if (!$existedData) return response()->json(['message' => 'Data tidak ditemukan'], 404);
+
+        return RequestListResource::collection($assetRequests);
+    }
 }
