@@ -4,6 +4,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RequestController;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +34,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/purchase', [PurchaseController::class, 'getPurchases']);
 
     Route::get('/locations', [LocationController::class, 'getLocations']);
+    Route::get('/priorities', [PriorityController::class, 'getPriorities']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
