@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PurchaseListResource;
 use App\Http\Resources\PurchaseResource;
 use App\Models\Purchase;
 use App\Models\Request as AssetRequest;
@@ -46,5 +47,14 @@ class PurchaseController extends Controller
         ]);
 
         return response()->json(['message' => 'Purchase request terbuat'], 201);
+    }
+
+    public function getPurchases()  {
+        $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+        $purchases = Purchase::paginate(10);
+
+        return PurchaseListResource::collection($purchases);
+        // return response()->json($purchases, 200);
     }
 }

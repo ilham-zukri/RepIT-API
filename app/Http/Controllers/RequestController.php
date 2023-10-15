@@ -68,12 +68,9 @@ class RequestController extends Controller
 
             return RequestListResource::collection($assetRequests);
         }
+        
 
-        if (!$access) {
-            $assetRequests = AssetRequest::whereRequesterId(auth()->user()->id)->orderBy('status_id', 'asc')->orderBy('priority_id', "asc")->paginate(10);
-            if (!$assetRequests->first()) return response()->json(['message' => 'Data tidak ditemukan'], 404);
-            return RequestListResource::collection($assetRequests);
-        };
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
 
         $sPriority = ($request->query('priority_sort')) ? $request->query('priority_sort') : 'asc';
         $sStatus = ($request->query('status_sort')) ? $request->query('status_sort') : 'asc';
@@ -96,6 +93,13 @@ class RequestController extends Controller
 
         if (!$existedData) return response()->json(['message' => 'Data tidak ditemukan'], 404);
 
+        return RequestListResource::collection($assetRequests);
+    }
+
+    // for Supervisor, giving only the requests they made
+    public function getMyRequests() {
+        $assetRequests = AssetRequest::whereRequesterId(auth()->user()->id)->orderBy('status_id', 'asc')->orderBy('priority_id', "asc")->paginate(10);
+        if (!$assetRequests->first()) return response()->json(['message' => 'Data tidak ditemukan'], 404);
         return RequestListResource::collection($assetRequests);
     }
 }

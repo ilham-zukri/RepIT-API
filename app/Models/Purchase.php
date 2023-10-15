@@ -57,4 +57,14 @@ class Purchase extends Model
     {
         return $this->hasMany(Asset::class, 'purchase_id', 'id');
     }
+
+    /**
+     * Get the status that owns the Purchase
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseStatus::class, 'status_id', 'id');
+    }
 }
