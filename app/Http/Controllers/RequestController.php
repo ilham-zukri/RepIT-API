@@ -61,6 +61,7 @@ class RequestController extends Controller
     {
         $access = auth()->user()->role->asset_approval;
 
+        //for IT Staff, giving only approved request
         if (auth()->user()->role->asset_purchasing && !$access) {
             $assetRequests = AssetRequest::where('status_id', '>', 1)->orderBy('status_id', 'asc')->orderBy('priority_id', "asc")->orderBy('created_at', 'desc')->paginate(10);
             if (!$assetRequests->first()) return response()->json(['message' => 'Data tidak ditemukan'], 404);
@@ -68,7 +69,11 @@ class RequestController extends Controller
             return RequestListResource::collection($assetRequests);
         }
 
-        if (!$access) return response()->json(['message' => 'Forbidden'], 403);
+        if (!$access) {
+            $assetRequests = AssetRequest::whereRequesterId(auth()->user()->id)->orderBy('status_id', 'asc')->orderBy('priority_id', "asc")->paginate(10);
+            if (!$assetRequests->first()) return response()->json(['message' => 'Data tidak ditemukan'], 404);
+            return RequestListResource::collection($assetRequests);
+        };
 
         $sPriority = ($request->query('priority_sort')) ? $request->query('priority_sort') : 'asc';
         $sStatus = ($request->query('status_sort')) ? $request->query('status_sort') : 'asc';
