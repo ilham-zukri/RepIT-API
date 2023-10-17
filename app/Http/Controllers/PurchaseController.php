@@ -55,6 +55,5 @@ class PurchaseController extends Controller
         $purchases = Purchase::paginate(10);
 
         return PurchaseListResource::collection($purchases);
-        // return response()->json($purchases, 200);
     }
 }

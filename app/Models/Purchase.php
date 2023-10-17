@@ -15,7 +15,7 @@ class Purchase extends Model
         'purchased_at',
         'purchased_from',
         'total_price',
-        'requested_id',
+        'request_id',
     ];
 
     /**
@@ -35,7 +35,7 @@ class Purchase extends Model
      */
     public function request(): BelongsTo
     {
-        return $this->belongsTo(Request::class, 'requested_id', 'id');
+        return $this->belongsTo(Request::class, 'request_id', 'id');
     }
 
     /**
