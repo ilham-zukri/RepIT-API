@@ -7,6 +7,7 @@ use App\Http\Resources\PurchaseResource;
 use App\Models\Purchase;
 use App\Models\Request as AssetRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
@@ -52,8 +53,33 @@ class PurchaseController extends Controller
     public function getPurchases()  {
         $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
         if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
-        $purchases = Purchase::paginate(10);
+        $purchases = Purchase::orderBy('status_id', 'asc')->orderBy('created_at', 'asc')->paginate(10);
 
         return PurchaseListResource::collection($purchases);
+    }
+
+    public function cancelPurchase(Request $request) : JsonResponse {
+        $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+
+        $request->validate([
+            'id' => 'required|integer'
+        ]);
+
+        $purchase = Purchase::whereId($request->id)->first();
+        if(!$purchase) return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
+
+        $request = $purchase->request;
+
+        $purchase->update([
+            'status_id' => 3
+        ]);
+
+        $request->update([
+            'status_id' => 2
+        ]);
+
+        return response()->json(['message' => 'berhasil'], 200);
+
     }
 }

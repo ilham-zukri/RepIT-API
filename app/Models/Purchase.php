@@ -10,13 +10,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Purchase extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'purchased_by',
-        'purchased_at',
-        'purchased_from',
-        'total_price',
-        'request_id',
-    ];
+    // protected $fillable = [
+    //     'purchased_by',
+    //     'purchased_at',
+    //     'purchased_from',
+    //     'total_price',
+    //     'request_id',
+    //     'status__id'
+    // ];
+
+    protected $guarded = [];
 
     /**
      * Get the user that owns the Purchase
