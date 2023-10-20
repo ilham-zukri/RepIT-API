@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PurchaseListResource;
-use App\Http\Resources\PurchaseResource;
-use App\Models\Purchase;
-use App\Models\Request as AssetRequest;
+use Dompdf\Dompdf;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Models\Request as AssetRequest;
+use App\Http\Resources\PurchaseResource;
+use App\Http\Resources\PurchaseListResource;
 
 class PurchaseController extends Controller
 {
-
     public function makePurchaseFromRequest(Request $request)
     {
         $user = User::where('id', auth()->user()->id)->first();
@@ -81,5 +81,21 @@ class PurchaseController extends Controller
 
         return response()->json(['message' => 'berhasil'], 200);
 
+    }
+
+    public function testPdf()
+    {
+        // instantiate and use the dompdf class
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml(view('purchase_document'));
+
+        // (Optional) Setup the paper size and orientation
+        $dompdf->setPaper('A5', 'landscape');
+
+        // Render the HTML as PDF
+        $dompdf->render();
+
+        // Output the generated PDF to Browser
+        $pdf = $dompdf->stream();
     }
 }

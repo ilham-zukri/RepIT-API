@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PurchaseController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/purchase-document', function () {
+    return view('purchase_document');
+});
+
+Route::get('/pdf', [PurchaseController::class, 'testPdf']);

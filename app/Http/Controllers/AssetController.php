@@ -14,7 +14,7 @@ class AssetController extends Controller
     public function makeAsset(Request $request)
     {
         $access = auth()->user()->role->asset_management;
-        if (!$access) return response()->json(['messagae' => 'tidak berwenang'], 200);
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
         $request->validate([
             'owner_id' => 'required|string',
