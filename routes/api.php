@@ -34,7 +34,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/asset/accept', [AssetController::class, 'acceptAsset']);
     Route::get('/purchases', [PurchaseController::class, 'getPurchases']);
 
-    Route::put('/purchase', [PurchaseController::class, 'cancelPurchase']);
+    Route::put('/purchase/cancel', [PurchaseController::class, 'cancelPurchase']);
+    Route::put('/purchase/receive', [PurchaseController::class, 'receivePurchase']);
 
     Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::get('/priorities', [PriorityController::class, 'getPriorities']);

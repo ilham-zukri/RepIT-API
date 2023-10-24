@@ -21,7 +21,7 @@ class Asset extends Model
         'utilization',
         'location_id',
         'deployed_at',
-        'status',
+        'status_id',
         'purchase_id',
         'scrapped_at',
     ];
@@ -54,5 +54,15 @@ class Asset extends Model
     public function purchase(): BelongsTo
     {
         return $this->belongsTo(Purchase::class, 'purchase_id', 'id');
+    }
+
+    /**
+     * Get the status that owns the Asset
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(AssetStatus::class, 'status_id', 'id');
     }
 }

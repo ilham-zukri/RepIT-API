@@ -101,44 +101,23 @@ class PurchaseController extends Controller
         $pdf = $dompdf->stream();
     }
 
-    public function recivePurchaseItems(Request $request): JsonResponse
+    public function receivePurchase(Request $request): JsonResponse
     {
         $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
         if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
 
         $request->validate([
-            'owner_id' => 'required|string',
-            'serial_number' => 'required|string',
-            'location_id' => 'required|integer'
+            'id' => 'required|integer'
         ]);
 
-        $purchase = Purchase::with('items')->find($request->purchase_id);
-
-        if (!$purchase) return response()->json(['message' => 'Data purchase tidak ditemukan'], 404);
+        $purchase = Purchase::find($request->id);
         
-
-        $isExisted = $purchase->items->contains('model', $request->model);
-
-        if (!$isExisted) return response()->json(['message' => 'Item tidak ditemukan pada data purchase'], 404);
+        if(!$purchase) return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
         
-
-        $assetModelCount = $purchase->assets->where('model', $request->model)->count();
-        $purchaseModelCount = $purchase->items->where('model', $request->model)->first()->amount;
-
-        if ($assetModelCount >= $purchaseModelCount) return response()->json(['message' => 'Jumlah Aset dengan Model tersebut sudah melebihi jumlah pembelian'], 400);
-
-        Asset::create([
-            'purchase_id' => $request->purchase_id,
-            'owner_id' => $request->owner_id,
-            'asset_type' => $request->asset_type,
-            'brand' => $request->brand,
-            'model' => $request->model,
-            'serial_number' => $request->serial_number,
-            'cpu' => $request->cpu ?? '#N/A',
-            'ram' => $request->ram ?? '#N/A',
-            'utilization' => $request->utilization,
-            'location_id' => $request->location_id,
-            'status' => 'Ready',
+        $purchase->update([
+            'status_id' => 2
         ]);
+
+        return response()->json(['message' => 'berhasil'], 200);
     }
 }

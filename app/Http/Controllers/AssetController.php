@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\AssetResource;
 use App\Models\Asset;
+use App\Models\AssetType;
 use App\Models\Purchase;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -16,14 +17,7 @@ class AssetController extends Controller
         $access = auth()->user()->role->asset_management;
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
-        $request->validate([
-            'owner_id' => 'required|string',
-            'serial_number' => 'required|string',
-            'location_id' => 'required|integer'
-        ]);
-
         if (!$request->purchase_id) {
-
             Asset::create([
                 'owner_id' => $request->owner_id,
                 'asset_type' => $request->asset_type,
@@ -37,6 +31,10 @@ class AssetController extends Controller
                 'status' => 'Ready',
             ]);
         } else {
+            $request->validate([
+                'purchase_id' => 'required|integer',
+                'items' => 'required|array'
+            ]);
 
             $purchase = Purchase::with('items')->find($request->purchase_id);
 
@@ -44,30 +42,41 @@ class AssetController extends Controller
                 return response()->json(['message' => 'Data purchase tidak ditemukan'], 404);
             }
 
-            $isExisted = $purchase->items->contains('model', $request->model);
+            if ($purchase->status_id != 2) return response()->json(['message' => 'pembelian belum diterima'], 403);
 
-            if (!$isExisted) {
-                return response()->json(['message' => 'Item tidak ditemukan pada data purchase'], 404);
+
+            $items = $request->items;
+
+            foreach ($items as $item) {
+                $modelToCount = $item['model'];
+
+                $isExisted = $purchase->items->contains('model', $modelToCount);
+
+                if (!$isExisted) {
+                    return response()->json(['message' => "Item {$modelToCount} tidak ditemukan pada data purchase"], 404);
+                }
+
+                $collection = collect($items);
+
+                $purchaseItemCount = $purchase->items->where('model', $item['model'])->first()->amount;
+
+                $count = $collection->filter(function ($item) use ($modelToCount) {
+                    return $item['model'] === $modelToCount;
+                })->count();
+
+                if($count > $purchaseItemCount) {
+                    return response()->json(['message' => "jumlah item untuk model {$modelToCount} melebihi pembelian" ], 400);
+                } elseif ($count < $purchaseItemCount){
+                    return response()->json(['message' => "jumlah item untuk model {$modelToCount} kurang dari pembelian" ], 400);
+
+                }
+
+                $item['owner_id'] = $purchase->request->for_user;
+                $item['deployed_at'] = date('Y-m-d');
+
+                $purchase->assets()->create($item);
             }
 
-            $assetModelCount = $purchase->assets->where('model', $request->model)->count();
-            $purchaseModelCount = $purchase->items->where('model', $request->model)->first()->amount;
-
-            if ($assetModelCount >= $purchaseModelCount) return response()->json(['message' => 'Jumlah Aset dengan Model tersebut sudah melebihi jumlah pembelian'], 400);
-
-            Asset::create([
-                'purchase_id' => $request->purchase_id,
-                'owner_id' => $request->owner_id,
-                'asset_type' => $request->asset_type,
-                'brand' => $request->brand,
-                'model' => $request->model,
-                'serial_number' => $request->serial_number,
-                'cpu' => $request->cpu ?? '#N/A',
-                'ram' => $request->ram ?? '#N/A',
-                'utilization' => $request->utilization,
-                'location_id' => $request->location_id,
-                'status' => 'Ready',
-            ]);
         }
 
         return response()->json(['message' => 'Data Aset Telah Dibuat'], 201);
@@ -90,18 +99,18 @@ class AssetController extends Controller
 
         $asset = Asset::whereId($request->asset_id)->first();
         if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
-        if ($asset->status != 'Ready') return response()->json(['message' => 'Asset Sudah di deploy'], 400);
+        if ($asset->status_id != 1) return response()->json(['message' => 'Asset Sudah di deploy'], 400);
 
         if ($user->id != $asset->owner_id) return response()->json(['message' => 'forbidden'], 403);
 
         $asset->update([
-            'status' => 'Deployed',
+            'status_id' => 2,
             'deployed_at' => date('Y-m-d')
         ]);
         return response()->json(
             [
                 'message' => 'Berhasil',
-                'status' => $asset->status
+                'status' => $asset->status->status
             ],
             200
         );

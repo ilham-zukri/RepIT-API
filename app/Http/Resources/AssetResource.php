@@ -24,7 +24,7 @@ class AssetResource extends JsonResource
             'ram' => $this->ram,
             'utilization' => $this->utilization,
             'location' => $this->location->name,
-            'status' => $this->status
+            'status' => $this->status->status
         ];
     }
 }
