@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Asset extends Model
 {
@@ -20,6 +21,7 @@ class Asset extends Model
         'ram',
         'utilization',
         'location_id',
+        'qr_code',
         'deployed_at',
         'status_id',
         'purchase_id',
@@ -64,5 +66,15 @@ class Asset extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(AssetStatus::class, 'status_id', 'id');
+    }
+
+    /**
+     * Get the qrCode associated with the Asset
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function qrCode(): HasOne
+    {
+        return $this->hasOne(QrCode::class, 'qr_code_id', 'qr_code');
     }
 }

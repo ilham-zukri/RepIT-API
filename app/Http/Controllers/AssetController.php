@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\AssetResource;
-use App\Models\Asset;
-use App\Models\AssetType;
-use App\Models\Purchase;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use App\Models\Asset;
+use App\Models\Purchase;
+use App\Models\AssetType;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Resources\AssetResource;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AssetController extends Controller
 {
@@ -44,6 +47,7 @@ class AssetController extends Controller
 
             if ($purchase->status_id != 2) return response()->json(['message' => 'pembelian belum diterima'], 403);
 
+            if ($purchase->status_id > 2) return response()->json(['message' => 'Asset untuk pembelian ini sudah diterima'], 403);
 
             $items = $request->items;
 
@@ -64,18 +68,33 @@ class AssetController extends Controller
                     return $item['model'] === $modelToCount;
                 })->count();
 
-                if($count > $purchaseItemCount) {
-                    return response()->json(['message' => "jumlah item untuk model {$modelToCount} melebihi pembelian" ], 400);
-                } elseif ($count < $purchaseItemCount){
-                    return response()->json(['message' => "jumlah item untuk model {$modelToCount} kurang dari pembelian" ], 400);
-
+                if ($count > $purchaseItemCount) {
+                    return response()->json(['message' => "jumlah item untuk model {$modelToCount} melebihi pembelian"], 400);
+                } elseif ($count < $purchaseItemCount) {
+                    return response()->json(['message' => "jumlah item untuk model {$modelToCount} kurang dari pembelian"], 400);
                 }
 
                 $item['owner_id'] = $purchase->request->for_user;
+                $item['qr_code'] = Str::uuid();
                 $item['deployed_at'] = date('Y-m-d');
 
-                $purchase->assets()->create($item);
+                $asset = $purchase->assets()->create($item);
+                $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .3)->margin(0)->size(300)->generate($asset->qr_code);
+
+                // Simpan QR Code di direktori publik
+                $qrCodePath = 'public/qrcodes/' . $asset->qr_code . '.png';
+                Storage::put($qrCodePath, $qrCode);
+
+                // Buat URL untuk QR Code
+                $qrCodeUrl = Storage::url($qrCodePath);
+                $asset->qrCode()->create([
+                    'path' => $qrCodeUrl
+                ]);
             }
+
+            $purchase->update([
+                'status_id' => 3
+            ]);
 
         }
 
