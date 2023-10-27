@@ -137,4 +137,13 @@ class AssetController extends Controller
             200
         );
     }
+
+    function getAllAssets(Request $request){
+        $access = auth()->user()->role->asset_management;
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
+
+        $assets = Asset::paginate(10);
+
+        return AssetResource::collection($assets);
+    }
 }

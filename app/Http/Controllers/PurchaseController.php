@@ -120,4 +120,15 @@ class PurchaseController extends Controller
 
         return response()->json(['message' => 'berhasil'], 200);
     }
+
+    public function getReceivedPurchases() {
+        $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+
+        $purchases = Purchase::where('status_id', 2)->paginate(10);
+
+        if(!$purchases->first()) return response()->json(['message' => 'Belum ada pembelian yang diterima'], 404);
+
+        return PurchaseListResource::collection($purchases);
+    }
 }
