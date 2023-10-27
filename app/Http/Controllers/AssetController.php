@@ -47,7 +47,7 @@ class AssetController extends Controller
 
             if ($purchase->status_id != 2) return response()->json(['message' => 'pembelian belum diterima'], 403);
 
-            if ($purchase->status_id > 2) return response()->json(['message' => 'Asset untuk pembelian ini sudah diterima'], 403);
+            if ($purchase->status_id > 2) return response()->json(['message' => 'Asset untuk pembelian ini sudah diterima atau dibatalkan'], 403);
 
             $items = $request->items;
 
@@ -73,7 +73,9 @@ class AssetController extends Controller
                 } elseif ($count < $purchaseItemCount) {
                     return response()->json(['message' => "jumlah item untuk model {$modelToCount} kurang dari pembelian"], 400);
                 }
+            }
 
+            foreach ($items as $item) {
                 $item['owner_id'] = $purchase->request->for_user;
                 $item['qr_code'] = Str::uuid();
                 $item['deployed_at'] = date('Y-m-d');
@@ -95,8 +97,9 @@ class AssetController extends Controller
             $purchase->update([
                 'status_id' => 3
             ]);
-
         }
+
+
 
         return response()->json(['message' => 'Data Aset Telah Dibuat'], 201);
     }
