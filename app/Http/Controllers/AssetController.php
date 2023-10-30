@@ -45,7 +45,7 @@ class AssetController extends Controller
                 return response()->json(['message' => 'Data purchase tidak ditemukan'], 404);
             }
 
-            if ($purchase->status_id != 2) return response()->json(['message' => 'pembelian belum diterima'], 403);
+            if ($purchase->status_id <   2) return response()->json(['message' => 'pembelian belum diterima'], 403);
 
             if ($purchase->status_id > 2) return response()->json(['message' => 'Asset untuk pembelian ini sudah diterima atau dibatalkan'], 403);
 
@@ -79,6 +79,9 @@ class AssetController extends Controller
                 $item['owner_id'] = $purchase->request->for_user;
                 $item['qr_code'] = Str::uuid();
                 $item['deployed_at'] = date('Y-m-d');
+                $item['location_id'] = $purchase->request->location_id;
+                $item['cpu'] = $item['cpu'] ?? '#N/A';
+                $item['ram'] = $item['ram'] ?? '#N/A';
 
                 $asset = $purchase->assets()->create($item);
                 $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .3)->margin(0)->size(300)->generate($asset->qr_code);
