@@ -16,6 +16,7 @@ class AssetResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'owner_id' => $this->owner->full_name ?? $this->owner->user_name,
             'asset_type' => $this->asset_type,
             'brand' => $this->brand,
             'model' => $this->model,

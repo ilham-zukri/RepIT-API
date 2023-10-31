@@ -17,10 +17,10 @@ class AssetController extends Controller
 {
     public function makeAsset(Request $request)
     {
-        $access = auth()->user()->role->asset_management;
-        if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
         if (!$request->purchase_id) {
+            $access = auth()->user()->role->asset_management || auth()->user()->role->asset_management;
+            if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
             $request->validate([
                 'owner_id' => 'required|uuid',
@@ -29,9 +29,9 @@ class AssetController extends Controller
                 'serial_number' => 'required|string',
                 'utilization' => 'required|string',
             ]);
-            
+
             $owner = User::find($request->owner_id);
-            if(!$owner) return response()->json(['message' => 'Owner tidak ditemukan'], 404);
+            if (!$owner) return response()->json(['message' => 'Owner tidak ditemukan'], 404);
 
             $asset = Asset::create([
                 'owner_id' => $request->owner_id,
@@ -58,8 +58,9 @@ class AssetController extends Controller
             $asset->qrCode()->create([
                 'path' => $qrCodeUrl
             ]);
-
         } else {
+            $access = auth()->user()->role->asset_management;
+            if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
             $request->validate([
                 'purchase_id' => 'required|integer',
                 'items' => 'required|array'
@@ -168,10 +169,15 @@ class AssetController extends Controller
 
     function getAllAssets(Request $request)
     {
-        $access = auth()->user()->role->asset_management;
+        $access = auth()->user()->role->asset_management || auth()->user()->role->asset_request;
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
-        $assets = Asset::paginate(10);
+        if (auth()->user()->role->asset_management) {
+            $assets = Asset::paginate(10);
+        } else {
+            $usersWithMatchingDepartment = User::where('department', auth()->user()->department)->pluck('id');
+            $assets = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment)->paginate(10);
+        }
 
         return AssetResource::collection($assets);
     }
