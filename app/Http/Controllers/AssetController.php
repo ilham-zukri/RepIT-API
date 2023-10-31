@@ -21,7 +21,19 @@ class AssetController extends Controller
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
         if (!$request->purchase_id) {
-            Asset::create([
+
+            $request->validate([
+                'owner_id' => 'required|uuid',
+                'asset_type' => 'required|string',
+                'brand' => 'required|string',
+                'serial_number' => 'required|string',
+                'utilization' => 'required|string',
+            ]);
+            
+            $owner = User::find($request->owner_id);
+            if(!$owner) return response()->json(['message' => 'Owner tidak ditemukan'], 404);
+
+            $asset = Asset::create([
                 'owner_id' => $request->owner_id,
                 'asset_type' => $request->asset_type,
                 'brand' => $request->brand,
@@ -30,9 +42,23 @@ class AssetController extends Controller
                 'cpu' => $request->cpu ?? '#N/A',
                 'ram' => $request->ram ?? '#N/A',
                 'utilization' => $request->utilization,
-                'location_id' => $request->location_id,
-                'status' => 'Ready',
+                'qr_code' => Str::uuid(),
+                'location_id' => $owner->branch_id,
+                'status_id' => 1,
             ]);
+
+            $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .3)->margin(0)->size(300)->generate($asset->qr_code);
+
+            // Simpan QR Code di direktori publik
+            $qrCodePath = 'public/qrcodes/' . $asset->qr_code . '.png';
+            Storage::put($qrCodePath, $qrCode);
+
+            // Buat URL untuk QR Code
+            $qrCodeUrl = Storage::url($qrCodePath);
+            $asset->qrCode()->create([
+                'path' => $qrCodeUrl
+            ]);
+
         } else {
             $request->validate([
                 'purchase_id' => 'required|integer',
@@ -78,7 +104,6 @@ class AssetController extends Controller
             foreach ($items as $item) {
                 $item['owner_id'] = $purchase->request->for_user;
                 $item['qr_code'] = Str::uuid();
-                $item['deployed_at'] = date('Y-m-d');
                 $item['location_id'] = $purchase->request->location_id;
                 $item['cpu'] = $item['cpu'] ?? '#N/A';
                 $item['ram'] = $item['ram'] ?? '#N/A';
@@ -141,7 +166,8 @@ class AssetController extends Controller
         );
     }
 
-    function getAllAssets(Request $request){
+    function getAllAssets(Request $request)
+    {
         $access = auth()->user()->role->asset_management;
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
