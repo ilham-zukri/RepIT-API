@@ -136,8 +136,8 @@ class AssetController extends Controller
     public function myAssets()
     {
         $user = User::where('id', auth()->user()->id)->first();
-        $assets = $user->assets;
-        return ['assets' => AssetResource::collection($assets)];
+        $assets = $user->assets()->paginate(10);
+        return AssetResource::collection($assets);
     }
 
     function acceptAsset(Request $request): JsonResponse
