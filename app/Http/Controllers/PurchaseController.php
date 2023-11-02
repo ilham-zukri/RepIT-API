@@ -26,15 +26,18 @@ class PurchaseController extends Controller
         $request->validate([
             'request_id' => 'required|integer',
             'purchased_from' => 'required|string',
+            'description' => 'required|string',
             'items' => 'required|array'
         ]);
 
         $assetRequest = AssetRequest::where('id', $request->request_id)->first();
         if (!$assetRequest) return response()->json(['message' => 'Request tidak ditemukan'], 404);
-        if ($assetRequest->status->status != 'Approved') return response()->json(['message' => 'Request Belum disetujui'], 401);
+        if ($assetRequest->status_id < 2) return response()->json(['message' => 'Request Belum disetujui'], 401);
+        if ($assetRequest->status_id > 2) return response()->json(['message' => 'Request sudah dibuatkan pembelian atau sudah dibatalkan'], 401);
 
         $purchase = $assetRequest->purchases()->create([
             'purchased_by' => $user->id,
+            'description' => $request->description,
             'purchased_from' => $request->purchased_from,
         ]);
 
@@ -51,7 +54,42 @@ class PurchaseController extends Controller
             'status_id' => 3
         ]);
 
-        return response()->json(['message' => 'Purchase request terbuat'], 201);
+        return $this->generatePurchaseDocument($purchase->id);
+
+        // return response()->json(['message' => 'Purchase request terbuat'], 201);
+    }
+
+    public function generatePurchaseDocument($purchaseId)
+    {
+
+        $purchase = Purchase::query()
+            ->select('id', 'purchased_by', 'total_price', 'created_at', 'purchased_from', 'description')
+            ->with(['items' => function ($query) {
+                $query->select('id', 'brand', 'model', 'amount', 'price_ea', 'total_price', 'purchase_id');
+            }, 'buyer:id,full_name'],)
+            ->where('id', $purchaseId)
+            ->first();
+
+        if (!$purchase) return response()->json(['message' => 'data purchase tidak ditemukan'], 404);
+
+        $date = Carbon::parse($purchase->created_at)->format('d F y');
+
+        $data = $purchase->toArray();
+        $data['created_at'] = $date;
+
+        $pdfPath = public_path('purchase-documents');
+
+        Pdf::loadView('purchase_document', [
+            'purchase' => $data
+        ])->setPaper('a5', 'landscape')->save($pdfPath . '/' . $purchase->id . '.pdf');
+
+        $pdfFullPath = $pdfPath . '/' . $purchase->id.'.pdf';
+
+        $purchase->update([
+            'doc_path' => $pdfFullPath
+        ]);
+
+        return response()->json(['message' => 'Berhasil Terbuat'], 201);
     }
 
     public function getPurchases()
@@ -89,43 +127,7 @@ class PurchaseController extends Controller
     }
 
 
-    public function generatePurchaseDocument(Request $request)
-    {
-        $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
-        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
-
-        $request->validate(['purchase_id' => 'required|integer']);
-
-        $purchase = Purchase::query()
-            ->select('id', 'purchased_by', 'total_price', 'created_at', 'purchased_from')
-            ->with(['items' => function ($query) {
-                $query->select('id', 'brand', 'model', 'amount', 'price_ea', 'total_price', 'purchase_id');
-            }, 'buyer:id,full_name'],)
-            ->where('id', $request->purchase_id)
-            ->first();
-
-        if (!$purchase) return response()->json(['message' => 'data purchase tidak ditemukan'], 404);
-
-        // $purchase->created_at = Carbon::parse($purchase->created_at)->format('d, F Y');
-        $date = Carbon::parse($purchase->created_at)->format('d F y');
-
-        $data = $purchase->toArray();
-        $data['created_at'] = $date;
-
-        $pdfPath = public_path('purchase-documents');
-
-        Pdf::loadView('purchase_document', [
-            'purchase' => $data
-        ])->setPaper('a5', 'landscape')->save($pdfPath . '/' . $purchase->id . '.pdf');
-
-        $pdfFullPath = $pdfPath . '/' . $purchase->id.'.pdf';
-
-        $purchase->update([
-            'doc_path' => $pdfFullPath
-        ]);
-
-        return response()->json(['message' => 'berhasil'], 201);
-    }
+    
 
     public function receivePurchase(Request $request): JsonResponse
     {

@@ -143,6 +143,15 @@
         <div class="total-price">
             Total Harga: {{$purchase['total_price']}}
         </div>
+
+        <div class="description">
+            <h4>Deskripsi:</h4>
+            <div>
+                {{$purchase['description']}}
+            </div>
+        </div>
+
+        <div class="description"></div>
         <table class="table-footer" cellspacing="10" cellpadding="0">
             <tr>
                 <td width="70%">
@@ -158,7 +167,7 @@
                     <p></p>
                 </td>
                 <td></td>
-                <td><p>Acung Salim</p></td>
+                <td><p>{{$purchase['buyer']['full_name']}}</p></td>
             </tr>
         </table>
     </div>
