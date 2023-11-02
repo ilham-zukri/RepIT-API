@@ -11,6 +11,8 @@ use Illuminate\Http\JsonResponse;
 use App\Models\Request as AssetRequest;
 use App\Http\Resources\PurchaseResource;
 use App\Http\Resources\PurchaseListResource;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class PurchaseController extends Controller
 {
@@ -85,20 +87,41 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'berhasil'], 200);
     }
 
-    public function testPdf()
+
+    public function generatePurchaseDocument(Request $request)
     {
-        // instantiate and use the dompdf class
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml(view('purchase_document'));
+        $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
 
-        // (Optional) Setup the paper size and orientation
-        $dompdf->setPaper('A5', 'landscape');
+        $request->validate(['purchase_id' => 'required|integer']);
 
-        // Render the HTML as PDF
-        $dompdf->render();
+        $purchase = Purchase::query()
+            ->select('id', 'purchased_by', 'total_price', 'created_at', 'purchased_from')
+            ->with(['items' => function ($query) {
+                $query->select('id', 'brand', 'model', 'amount', 'price_ea', 'total_price', 'purchase_id');
+            }, 'buyer:id,full_name'],)
+            ->where('id', $request->purchase_id)
+            ->first();
 
-        // Output the generated PDF to Browser
-        $pdf = $dompdf->stream();
+        if (!$purchase) return response()->json(['message' => 'data purchase tidak ditemukan'], 404);
+
+        $data = $purchase->toArray();
+
+        $pdfPath = public_path('purchase-documents');
+
+
+        Pdf::loadView('purchase_document', [
+            'purchase' => $data
+        ])->setPaper('a5', 'landscape')->save($pdfPath . '/' . $purchase->id . '.pdf');
+
+        $pdfFullPath = $pdfPath . '/' . $purchase->id.'.pdf';
+
+
+        $purchase->update([
+            'doc_path' => $pdfFullPath
+        ]);
+
+        return response()->json(['message' => 'berhasil'], 201);
     }
 
     public function receivePurchase(Request $request): JsonResponse
@@ -111,9 +134,9 @@ class PurchaseController extends Controller
         ]);
 
         $purchase = Purchase::find($request->id);
-        
-        if(!$purchase) return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
-        
+
+        if (!$purchase) return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
+
         $purchase->update([
             'status_id' => 2
         ]);
@@ -121,13 +144,14 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'berhasil'], 200);
     }
 
-    public function getReceivedPurchases() {
+    public function getReceivedPurchases()
+    {
         $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
         if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
 
         $purchases = Purchase::where('status_id', 2)->paginate(10);
 
-        if(!$purchases->first()) return response()->json(['message' => 'Belum ada pembelian yang diterima'], 404);
+        if (!$purchases->first()) return response()->json(['message' => 'Belum ada pembelian yang diterima'], 404);
 
         return PurchaseListResource::collection($purchases);
     }

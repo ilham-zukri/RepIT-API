@@ -36,6 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/purchases', [PurchaseController::class, 'getPurchases']);
     Route::get('/purchases/received', [PurchaseController::class, 'getReceivedPurchases']);
+    Route::post('/purchase/generate-pdf', [PurchaseController::class, 'generatePurchaseDocument']);
 
     Route::put('/purchase/cancel', [PurchaseController::class, 'cancelPurchase']);
     Route::put('/purchase/receive', [PurchaseController::class, 'receivePurchase']);

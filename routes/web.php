@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PurchaseController;
 use Illuminate\Support\Facades\Route;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,7 +20,8 @@ Route::get('/', function () {
 });
 
 Route::get('/purchase-document', function () {
-    return view('purchase_document');
+    $pdf = Pdf::loadView('purchase_document')->setPaper('a5', 'landscape');
+    return $pdf->download('masa_iya.pdf');
 });
 
 Route::get('/pdf', [PurchaseController::class, 'testPdf']);

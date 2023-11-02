@@ -3,6 +3,10 @@
 <head>
     <title>Purchase Order</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: Arial, sans-serif;
             font-size: 12pt; /* Menggunakan ukuran font dalam poin */
@@ -16,22 +20,35 @@
             font-size: 16pt; /* Menggunakan ukuran font dalam poin */
             font-weight: bold;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;    
         }
         .company-info {
             text-align: right;
         }
-        table {
+        .table-heading {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+        }
+        .main-content-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
         }
-        table, th, td {
+        .main-content-table, 
+        .main-content-table th, 
+        .main-content-table td {
             border: 1px solid #000;
         }
-        th, td {
+        .main-content-table th, 
+        .main-content-table td {
             padding: 8pt; /* Menggunakan ukuran margin dalam poin */
             font-size: 10pt; /* Menggunakan ukuran font dalam poin */
+        }
+        .table-footer {
+            width: 100%;
+            margin-top: 1rem;
         }
         .signatures {
             margin-top: 80pt; /* Menggunakan ukuran margin dalam poin */
@@ -63,23 +80,48 @@
             font-weight: bold;
             margin-top: 8pt; /* Menggunakan ukuran margin dalam poin */
         }
+        .page-break {
+            page-break-after: always;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="po-title">
-                Purchase Order
-                <div class="po-number">No: 258</div>
-                <div class="vendor-name">Vendor: Mandiri Jaya Komputer</div>
-            </div>
-            <div class="company-info">
-                CV Sabar Maju
-                <div class="dept-name">Departemen IT</div>
-                <div class="vendor-name">12-11-22</div>
-            </div>
-        </div>
-        <table>
+        <table class="table-heading">
+            <tr>
+                <td width="76%">
+                    <table class="left-table-heading">
+                        <tr>
+                            <td>
+                                <h2>Purchase Order</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>PO Number: {{ $purchase['id'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Vendor: {{$purchase['purchased_from']}}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="right-table-heading">
+                        <tr>
+                            <td>
+                                <h2>CV. Sabar Maju</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Department IT</td>
+                        </tr>
+                        <tr>
+                            <td>{{ $purchase['created_at'] }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <table class="main-content-table">
             <tr>
                 <th style="width: 5%;">No</th>
                 <th style="width: 30%;">Nama Barang</th>
@@ -87,32 +129,38 @@
                 <th style="width: 10%;">Jumlah</th>
                 <th style="width: 15%;">Total</th>
             </tr>
+            @foreach ($purchase['items'] as $key => $item )
+                <tr>
+                    <td>{{ $key + 1 }}</td>
+                    <td>{{$item['brand']}} - {{$item['model']}}</td>
+                    <td>{{$item['price_ea']}}</td>
+                    <td>{{$item['amount']}}</td>
+                    <td>{{$item['total_price']}}</td>
+                </tr>
+            @endforeach
+        </table>
+        
+        <div class="total-price">
+            Total Harga: {{$purchase['total_price']}}
+        </div>
+        <table class="table-footer" cellspacing="10" cellpadding="0">
             <tr>
-                <td>1</td>
-                <td>Product A</td>
-                <td>5.000.000</td>
-                <td>2</td>
-                <td>10.000.000</td>
+                <td width="70%">
+                    <h4>Mengetahui</h4>
+                </td>
+                <td height="80"></td>
+                <td>
+                    <h4>Pembuat</h4>
+                </td>
             </tr>
             <tr>
-                <td>2</td>
-                <td>Product B</td>
-                <td>2.000.000</td>
-                <td>2</td>
-                <td>4.000.00</td>
+                <td>
+                    <p></p>
+                </td>
+                <td></td>
+                <td><p>Acung Salim</p></td>
             </tr>
         </table>
-        <div class="total-price">
-            Total Harga: 14.000.000
-        </div>
-        <div class="signatures">
-            <div class="signature">
-                <p>Mengetahui</p>
-            </div>
-            <div class="signature">
-                <p>Pembuat</p>
-            </div>
-        </div>
     </div>
 </body>
 </html>
