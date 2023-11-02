@@ -12,6 +12,7 @@ use App\Models\Request as AssetRequest;
 use App\Http\Resources\PurchaseResource;
 use App\Http\Resources\PurchaseListResource;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class PurchaseController extends Controller
@@ -105,17 +106,19 @@ class PurchaseController extends Controller
 
         if (!$purchase) return response()->json(['message' => 'data purchase tidak ditemukan'], 404);
 
+        // $purchase->created_at = Carbon::parse($purchase->created_at)->format('d, F Y');
+        $date = Carbon::parse($purchase->created_at)->format('d F y');
+
         $data = $purchase->toArray();
+        $data['created_at'] = $date;
 
         $pdfPath = public_path('purchase-documents');
-
 
         Pdf::loadView('purchase_document', [
             'purchase' => $data
         ])->setPaper('a5', 'landscape')->save($pdfPath . '/' . $purchase->id . '.pdf');
 
         $pdfFullPath = $pdfPath . '/' . $purchase->id.'.pdf';
-
 
         $purchase->update([
             'doc_path' => $pdfFullPath

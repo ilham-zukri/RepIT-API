@@ -115,7 +115,7 @@
                             <td>Department IT</td>
                         </tr>
                         <tr>
-                            <td>{{ $purchase['created_at'] }}</td>
+                            <td>{{ $purchase['created_at']}}</td>
                         </tr>
                     </table>
                 </td>
