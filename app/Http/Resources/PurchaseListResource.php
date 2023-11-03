@@ -20,6 +20,7 @@ class PurchaseListResource extends JsonResource
             "requester" => $this->request->requester->full_name ?? $this->request->requester->user_name,
             "purchased_by"=> $this->buyer->full_name ?? $this->buyer->user_name,
             "purchased_from"=> $this->purchased_from,
+            "doc_path" => $this->doc_path,
             "items" => $this->items,
             "total_price"=> $this->total_price,
             "status"=> $this->status->status,
