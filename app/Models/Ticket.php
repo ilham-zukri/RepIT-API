@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -59,5 +60,25 @@ class Ticket extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(TicketStatus::class, 'ticket_status_id', 'id');
+    }
+
+    /**
+     * Get all of the note for the Ticket
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function note(): HasMany
+    {
+        return $this->hasMany(TicketsNote::class, 'ticket_id', 'id');
+    }
+
+    /**
+     * Get all of the images for the Ticket
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(TicketsImage::class, 'ticket_id', 'id');
     }
 }

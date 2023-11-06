@@ -1,13 +1,14 @@
 <?php
 
-use App\Http\Controllers\AssetController;
-use App\Http\Controllers\AssetTypeController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AssetController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\RequestController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AssetTypeController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -28,18 +29,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);
     Route::get('/asset-type', [AssetTypeController::class, 'getAssetTypes']);
     
-    Route::post('/purchase', [PurchaseController::class, 'makePurchaseFromRequest']);
 
     Route::get('/asset/myAssets', [AssetController::class, 'myAssets']);
     Route::get('/assets', [AssetController::class, 'getAllAssets']);
     Route::put('/asset/accept', [AssetController::class, 'acceptAsset']);
 
+    Route::post('/purchase', [PurchaseController::class, 'makePurchaseFromRequest']);
     Route::get('/purchases', [PurchaseController::class, 'getPurchases']);
     Route::get('/purchases/received', [PurchaseController::class, 'getReceivedPurchases']);
     Route::post('/purchase/generate-pdf', [PurchaseController::class, 'generatePurchaseDocument']);
-
     Route::put('/purchase/cancel', [PurchaseController::class, 'cancelPurchase']);
     Route::put('/purchase/receive', [PurchaseController::class, 'receivePurchase']);
+
+    Route::post('/ticket', [TicketController::class, 'createTicket']);
 
     Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::get('/priorities', [PriorityController::class, 'getPriorities']);

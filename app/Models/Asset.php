@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -76,5 +77,15 @@ class Asset extends Model
     public function qrCode(): HasOne
     {
         return $this->hasOne(QrCode::class, 'qr_code_id', 'qr_code');
+    }
+
+    /**
+     * Get all of the tickets for the Asset
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'asset_id', 'id');
     }
 }

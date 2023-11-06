@@ -85,6 +85,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all of the handledTickets for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function handledTickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'handler_id', 'id');
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>

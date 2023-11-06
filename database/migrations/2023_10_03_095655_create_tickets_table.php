@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('asset_id')->references('id')->on('assets')->onDelete('cascade');
             $table->text('description');
             $table->unsignedBigInteger('status_id');
-            $table->foreign('status_id')->references('id')->on('ticket_statuses')->onDelete('cascade');
+            $table->foreign('status_id')->references('id')->on('ticket_statuses')->onDelete('cascade')->default(1);
             $table->timestamps();
         });
     }
