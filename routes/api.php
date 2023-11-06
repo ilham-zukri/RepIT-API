@@ -42,7 +42,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/purchase/receive', [PurchaseController::class, 'receivePurchase']);
 
     Route::post('/ticket', [TicketController::class, 'createTicket']);
-
+    Route::get('/tickets', [TicketController::class, 'getAllTickets']);
+    Route::get('/tickets/my-tickets', [TicketController::class, 'getMyTickets']);
+    
     Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::get('/priorities', [PriorityController::class, 'getPriorities']);
 });
