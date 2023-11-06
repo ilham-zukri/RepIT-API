@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tickets', function (Blueprint $table) {
-            $table->date('responded_at')->nullable()->after('created_at');
+            $table->dateTime('responded_at')->nullable()->after('created_at');
         });
     }
 

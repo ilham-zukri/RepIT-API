@@ -95,6 +95,9 @@ class TicketController extends Controller
         $ticket = Ticket::find($request->ticket_id);
         if (!$ticket) return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
 
+        $handler = $ticket->handler_id;
+        if($handler) return response()->json(['message' => 'Tiket sudah memiliki Handler'], 403);
+
         $ticket->update([
             'handler_id' => auth()->user()->id,
             'status_id' => 2,
@@ -135,6 +138,7 @@ class TicketController extends Controller
 
         $ticket = Ticket::find($request->ticket_id);
         if (!$ticket) return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+        if ($ticket->handler_id != auth()->user()->id) return response()->json(['message' => 'Forbidden'], 403);
 
         $ticket->update([
             'status_id' => 6,
@@ -159,6 +163,7 @@ class TicketController extends Controller
 
         $ticket = Ticket::find($request->ticket_id);
         if (!$ticket) return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+        if ($ticket->handler_id != auth()->user()->id) return response()->json(['message' => 'Forbidden'], 403);
 
         $hasNote = $ticket->note()->exists();
 
@@ -171,7 +176,7 @@ class TicketController extends Controller
                 'resolution_note' => $request->resolution_note
             ]);
         }
-        
+
         $ticket->update([
             'status_id' => 4,
         ]);
@@ -194,6 +199,7 @@ class TicketController extends Controller
 
         $ticket->update([
             'status_id' => 5,
+            'resolved_at' => now()
         ]);
 
         return response()->json(['message' => 'Tiket berhasil ditutup'], 200);
