@@ -3,6 +3,9 @@
 /public/build
 /public/hot
 /public/storage
+/public/storage
+/public/purchase-documents
+/public/tickets-images
 /storage/*.key
 /vendor
 .env
