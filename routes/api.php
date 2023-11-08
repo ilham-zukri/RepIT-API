@@ -9,6 +9,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AssetTypeController;
+use App\Http\Controllers\TicketCategoryController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -28,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);
     Route::get('/asset-type', [AssetTypeController::class, 'getAssetTypes']);
+    Route::get('/asset-list', [AssetController::class, 'myAssetList']);
     
 
     Route::get('/asset/myAssets', [AssetController::class, 'myAssets']);
@@ -53,6 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::get('/priorities', [PriorityController::class, 'getPriorities']);
+    Route::get('/ticket-categories', [TicketCategoryController::class, 'getCategories']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);

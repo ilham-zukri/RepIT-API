@@ -24,6 +24,16 @@ class Ticket extends Model
     }
 
     /**
+     * Get the createdBt that owns the Ticket
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_id', 'id');
+    }
+
+    /**
      * Get the asset that owns the Ticket
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

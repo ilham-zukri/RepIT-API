@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('priority_id');
             $table->foreign('priority_id')->references('id')->on('priorities')->onDelete('cascade');
             $table->string('category', 255);
-            $table->unsignedBigInteger('asset_id');
+            $table->unsignedBigInteger('asset_id')->nullable();
             $table->foreign('asset_id')->references('id')->on('assets')->onDelete('cascade');
             $table->text('description');
             $table->unsignedBigInteger('status_id');

@@ -14,7 +14,6 @@ class TicketController extends Controller
     public function createTicket(Request $request): JsonResponse
     {
         $request->validate([
-            'asset_id' => 'required|integer',
             'priority_id' => 'required|integer',
             'title' => 'required|string',
             'description' => 'required|string',
@@ -23,13 +22,22 @@ class TicketController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $asset = Asset::find($request->asset_id);
+        if($request->ticket_category_id == 1) {
+            $request->validate([
+                'asset_id' => 'required|integer',
+            ]);
 
-        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
-        if ($asset->owner_id != $request->user()->id) return response()->json(['message' => 'Hanya pemilik asset yang dapat membuat tiket'], 403);
-
-        $ticket = Ticket::create($request->except('images'));
-
+            $asset = Asset::find($request->asset_id);
+            if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+            $user = auth()->user();
+            if ($asset->owner_id != $user->id) {
+                return response()->json(['message' => 'Hanya pemilik asset yang diizinkan untuk membuat tiket'], 403);
+            }
+        }
+        $ticketData = $request->except('images');
+        $ticketData['created_by_id'] = auth()->user()->id;
+        $ticket = Ticket::create($ticketData);
+    
         if ($request->hasFile('images')) {
             $imagesPath = public_path('tickets-images');
             foreach ($request->file('images') as $image) {
@@ -40,9 +48,11 @@ class TicketController extends Controller
                 ]);
             }
         }
-
-        return response()->json(['message' => 'Tiket berhasil dibuat'], 200);
+    
+        return response()->json(['message' => 'Tiket berhasil dibuat'], 201);
     }
+
+
 
     public function getAllTickets(Request $request)
     {
