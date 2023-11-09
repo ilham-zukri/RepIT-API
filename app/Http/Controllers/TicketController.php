@@ -22,7 +22,7 @@ class TicketController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        if($request->ticket_category_id == 1) {
+        if ($request->ticket_category_id == 1) {
             $request->validate([
                 'asset_id' => 'required|integer',
             ]);
@@ -37,7 +37,7 @@ class TicketController extends Controller
         $ticketData = $request->except('images');
         $ticketData['created_by_id'] = auth()->user()->id;
         $ticket = Ticket::create($ticketData);
-    
+
         if ($request->hasFile('images')) {
             $imagesPath = public_path('tickets-images');
             foreach ($request->file('images') as $image) {
@@ -48,7 +48,7 @@ class TicketController extends Controller
                 ]);
             }
         }
-    
+
         return response()->json(['message' => 'Tiket berhasil dibuat'], 201);
     }
 
@@ -80,8 +80,8 @@ class TicketController extends Controller
     public function getMyTickets(Request $request)
     {
         $user = auth()->user();
-        $assets = $user->assets->pluck('id')->flatten();
-        $tickets = Ticket::whereIn('asset_id', $assets)
+
+        $tickets = Ticket::whereCreatedById($user->id)
             ->orderBy('priority_id', 'asc')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -106,7 +106,7 @@ class TicketController extends Controller
         if (!$ticket) return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
 
         $handler = $ticket->handler_id;
-        if($handler) return response()->json(['message' => 'Tiket sudah memiliki Handler'], 403);
+        if ($handler) return response()->json(['message' => 'Tiket sudah memiliki Handler'], 403);
 
         $ticket->update([
             'handler_id' => auth()->user()->id,
