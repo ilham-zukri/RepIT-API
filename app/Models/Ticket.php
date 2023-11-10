@@ -92,4 +92,11 @@ class Ticket extends Model
     {
         return $this->hasMany(TicketsImage::class, 'ticket_id', 'id');
     }
+
+    protected $casts = [
+        'responded_at' => 'datetime',
+        'resolved_at' => 'datetime',
+        'closed_at' => 'datetime',
+    ];
+    
 }

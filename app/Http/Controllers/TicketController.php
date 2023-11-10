@@ -52,8 +52,6 @@ class TicketController extends Controller
         return response()->json(['message' => 'Tiket berhasil dibuat'], 201);
     }
 
-
-
     public function getAllTickets(Request $request)
     {
         $access = auth()->user()->role->asset_management;
@@ -64,16 +62,16 @@ class TicketController extends Controller
         }
 
         $ticketsQuery = Ticket::where('ticket_category_id', 1)
+            ->orderBy('status_id', 'asc')
             ->orderBy('priority_id', 'asc')
             ->orderBy('created_at', 'desc');
 
         if ($spvAccess) {
-            $ticketsQuery = Ticket::orderBy('priority', 'asc')
+            $ticketsQuery = Ticket::orderBy('status_id', 'asc')->orderBy('priority_id', 'asc')
                 ->orderBy('created_at', 'desc');
         }
 
         $tickets = $ticketsQuery->paginate(10);
-
         return TicketResource::collection($tickets);
     }
 
@@ -82,9 +80,31 @@ class TicketController extends Controller
         $user = auth()->user();
 
         $tickets = Ticket::whereCreatedById($user->id)
+            ->where('status_id', '!=', 5)
             ->orderBy('priority_id', 'asc')
+            ->orderBy('status_id', 'asc')
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+
+        if ($tickets->isEmpty()) {
+            return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+        }
+
+        return TicketResource::collection($tickets);
+    }
+
+    public function getHandledTickets(Request $request)
+    {
+        $user = auth()->user();
+        if (!$user->role->asset_management) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+        $tickets = Ticket::whereHandlerId($user->id)
+        ->where('status_id', '!=', 5)
+        ->orderBy('priority_id', 'asc')
+        ->orderBy('status_id', 'asc')
+        ->orderBy('created_at', 'desc');
+        $tickets = $tickets->paginate(10);
 
         if ($tickets->isEmpty()) {
             return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
@@ -114,7 +134,14 @@ class TicketController extends Controller
             'responded_at' => now()
         ]);
 
-        return response()->json(['message' => 'Berhasil ambil tiket'], 200);
+        return response()->json([
+            'message' => 'Berhasil ambil tiket',
+            'data' => [
+                'handler' => $ticket->handler->full_name ?? "#N/A",
+                'responded_at' => $ticket->responded_at ? $ticket->responded_at->format('d/m/Y | H:i') : null,
+                'status' => $ticket->status->status
+            ]
+        ], 200);
     }
 
     public function progressTicket(Request $request)
@@ -133,7 +160,12 @@ class TicketController extends Controller
             'status_id' => 3
         ]);
 
-        return response()->json(['message' => 'Berhasil'], 200);
+        return response()->json([
+            'message' => 'Berhasil',
+            'data' => [
+                'status' => $ticket->status->status
+            ]
+        ], 200);
     }
 
     public function holdTicket(Request $request)
@@ -189,9 +221,15 @@ class TicketController extends Controller
 
         $ticket->update([
             'status_id' => 4,
+            'resolved_at' => now()
         ]);
 
-        return response()->json(['message' => 'Tiket berhasil ditindak lanjut'], 200);
+        return response()->json([
+            'message' => 'Tiket berhasil ditindak lanjut',
+            'data' => [
+                'status' => $ticket->status->status
+            ]
+        ], 200);
     }
 
     public function closeTicket(Request $request)
@@ -204,14 +242,23 @@ class TicketController extends Controller
         $ticket = Ticket::find($request->ticket_id);
         if (!$ticket) return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
 
-        $asset = $ticket->asset;
-        if ($asset->owner_id != $user->id) return response()->json(['message' => 'Forbidden'], 403);
+        if ($ticket->asset_id) {
+            $asset = $ticket->asset;
+            if ($asset->owner_id != $user->id) return response()->json(['message' => 'Forbidden'], 403);
+        } else {
+            if ($ticket->created_by_id != $user->id) return response()->json(['message' => 'Forbidden'], 403);
+        }
 
         $ticket->update([
             'status_id' => 5,
-            'resolved_at' => now()
+            'closed_at' => now()
         ]);
 
-        return response()->json(['message' => 'Tiket berhasil ditutup'], 200);
+        return response()->json([
+            'message' => 'Tiket berhasil ditutup',
+            'data' => [
+                'status' => $ticket->status->status
+            ]
+        ], 200);
     }
 }

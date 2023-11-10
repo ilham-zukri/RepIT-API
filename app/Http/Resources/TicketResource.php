@@ -25,13 +25,16 @@ class TicketResource extends JsonResource
             'asset_id' => $this->asset_id,
             'priority' => $this->priority,
             'created_by' => $this->createdBy->full_name ?? $this->createdBy->user_name,
-            'location' => $location,
+            'location' => $location ,
             'title' => $this->title,
             'description' => $this->description,
             'category' => $this->category,
             'handler' => $this->handler->full_name ?? "#N/A",
             'status' => $this->status->status,
-            'created_at' => $this->created_at->format('d-m-Y'),
+            'created_at' => $this->created_at->format('d/m/Y | H:i'), //replace m with F if you want to use named month
+            'responded_at' => $this->responded_at ? $this->responded_at->format('d/m/Y | H:i') : null,
+            'resolved_at' => $this->resolved_at ? $this->resolved_at->format('d/m/Y | H:i') : null,
+            'closed_at' => $this->closed_at ? $this->closed_at->format('d/m/Y | H:i') : null,
             'images' => $this->images
         ];
     }
