@@ -30,4 +30,9 @@ class SparePartRequest extends Model
     {
         return $this->belongsTo(RequestStatus::class, 'status_id');
     }
+
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'created_at' => 'datetime',
+    ];  
 }

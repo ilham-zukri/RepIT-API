@@ -28,8 +28,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/requests', [RequestController::class, 'getRequests']);
     Route::get('/my-requests', [RequestController::class, 'getMyRequests']);
 
-    Route::post('spare-parts/request', [SparePartRequestController::class, 'makeSparepartRequest']);
+    Route::post('/spare-parts/request', [SparePartRequestController::class, 'makeSparepartRequest']);
     Route::get('/spare-parts/requests', [SparePartRequestController::class, 'getSparepartRequests']);
+    Route::put('/spare-parts/request/approve', [SparePartRequestController::class, 'approveSparepartRequest']);
 
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);
     Route::get('/asset-type', [AssetTypeController::class, 'getAssetTypes']);

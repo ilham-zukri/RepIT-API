@@ -83,7 +83,7 @@ class PurchaseController extends Controller
             'purchase' => $data
         ])->setPaper('a5', 'landscape')->save($pdfPath . '/' . $purchase->id . '.pdf');
 
-        $pdfFullPath = $pdfPath . '/' . $purchase->id.'.pdf';
+        $pdfFullPath = $pdfPath . '/' . $purchase->id . '.pdf';
 
         $purchase->update([
             'doc_path' => $pdfFullPath
@@ -96,7 +96,9 @@ class PurchaseController extends Controller
     {
         $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
         if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
-        $purchases = Purchase::orderBy('status_id', 'asc')->orderBy('created_at', 'asc')->paginate(10);
+        $purchases = Purchase::orderBy('status_id', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->paginate(10);
 
         return PurchaseListResource::collection($purchases);
     }
@@ -127,7 +129,7 @@ class PurchaseController extends Controller
     }
 
 
-    
+
 
     public function receivePurchase(Request $request): JsonResponse
     {
