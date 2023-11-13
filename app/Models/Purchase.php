@@ -63,4 +63,14 @@ class Purchase extends Model
     {
         return $this->belongsTo(PurchaseStatus::class, 'status_id', 'id');
     }
+
+    /**
+     * Get the type that owns the Purchase
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function type(): BelongsTo
+    {
+        return $this->belongsTo(PurchaseType::class, 'type_id', 'id');
+    }
 }

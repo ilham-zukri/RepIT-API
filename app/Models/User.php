@@ -65,6 +65,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all of the sparePartRequests for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function sparePartRequests(): HasMany
+    {
+        return $this->hasMany(SparePartRequest::class, 'requester_id', 'id');
+    }
+
+    /**
      * Get the branch that owns the User
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

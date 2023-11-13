@@ -127,9 +127,6 @@ class AssetController extends Controller
                 'status_id' => 3
             ]);
         }
-
-
-
         return response()->json(['message' => 'Data Aset Telah Dibuat'], 201);
     }
 

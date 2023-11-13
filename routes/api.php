@@ -10,6 +10,7 @@ use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\TicketCategoryController;
+use App\Http\Controllers\SparePartRequestController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -26,6 +27,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/request/approve', [RequestController::class, 'approveRequest']);
     Route::get('/requests', [RequestController::class, 'getRequests']);
     Route::get('/my-requests', [RequestController::class, 'getMyRequests']);
+
+    Route::post('spare-parts/request', [SparePartRequestController::class, 'makeSparepartRequest']);
+    Route::get('/spare-parts/requests', [SparePartRequestController::class, 'getSparepartRequests']);
 
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);
     Route::get('/asset-type', [AssetTypeController::class, 'getAssetTypes']);
