@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\SparePartRequest;
 use App\Models\SparePartPurchase;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\SparePartPurchaseResource;
 
 class SparePartPurchaseController extends Controller
 {
@@ -82,5 +83,74 @@ class SparePartPurchaseController extends Controller
         return response()->json(['message' => 'Berhasil Terbuat'], 201);
     }
 
+    public function getPurchases() {
+        $user = User::where('id', auth()->user()->id)->first();
+        $access = $user->role->asset_purchasing;
+        if (!$access) return response()->json(['message' => 'forbidden'], 403);
 
+        $purchases = SparePartPurchase::orderBy('status_id', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->paginate(10);
+        
+        return SparePartPurchaseResource::collection($purchases);
+    }
+
+    public function cancelPurchase(Request $request): JsonResponse
+    {
+        $access = (auth()->user()->role->asset_purchasing);
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+
+        $request->validate([
+            'id' => 'required|integer'
+        ]);
+
+        $purchase = SparePartPurchase::whereId($request->id)->first();
+        if (!$purchase) return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
+
+        $request = $purchase->request;
+
+        $purchase->update([
+            'status_id' => 4
+        ]);
+
+        $request->update([
+            'status_id' => 2
+        ]);
+
+        return response()->json(['message' => 'berhasil'], 200);
+    }
+
+    public function receivePurchase(Request $request): JsonResponse
+    {
+        $access = (auth()->user()->role->asset_purchasing);
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+
+        $request->validate([
+            'id' => 'required|integer'
+        ]);
+
+        $purchase = SparePartPurchase::find($request->id);
+
+        if (!$purchase) return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
+
+        $purchase->update([
+            'status_id' => 2
+        ]);
+
+        return response()->json(['message' => 'berhasil'], 200);
+    }
+
+    public function getReceivedPurchases()
+    {
+        $access = (auth()->user()->role->asset_purchasing);
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+
+        $purchases = SparePartPurchase::where('status_id', 2)->paginate(10);
+
+        if (!$purchases->first()) return response()->json(['message' => 'Belum ada pembelian yang diterima'], 404);
+
+        return SparePartPurchaseResource::collection($purchases);
+    }
+
+    
 }

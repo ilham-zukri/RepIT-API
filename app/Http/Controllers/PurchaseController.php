@@ -59,7 +59,7 @@ class PurchaseController extends Controller
         // return response()->json(['message' => 'Purchase request terbuat'], 201);
     }
 
-    public function generatePurchaseDocument($purchaseId)
+    protected function generatePurchaseDocument($purchaseId)
     {
 
         $purchase = Purchase::query()
