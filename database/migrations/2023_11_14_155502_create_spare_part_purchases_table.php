@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('request_id');
             $table->foreign('request_id')->references('id')->on('spare_part_requests')->onDelete('cascade');
-           $table->string('purchased_by_id', 255);
+            $table->string('purchased_by_id', 255);
             $table->foreign('purchased_by_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('purchased_from', 255);
-            $table->bigInteger('total_price');
-            $table->unsignedBigInteger('status_id');
+            $table->bigInteger('total_price')->nullable();
+            $table->unsignedBigInteger('status_id')->default(1);
             $table->foreign('status_id')->references('id')->on('purchase_statuses')->onDelete('cascade');
             $table->text('description');
             $table->string('doc_path', 255)->nullable();

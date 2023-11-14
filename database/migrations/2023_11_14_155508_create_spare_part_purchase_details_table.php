@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('spare_part_purchase_details', function (Blueprint $table) {
+        Schema::create('spare_part_purchase_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('purchase_id');
             $table->foreign('purchase_id')->references('id')->on('spare_part_purchases')->onDelete('cascade');
