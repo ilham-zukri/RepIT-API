@@ -19,8 +19,8 @@ class AssetController extends Controller
     {
 
         if (!$request->purchase_id) {
-            $access = auth()->user()->role->asset_management || auth()->user()->role->asset_management;
-            if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
+            $access = auth()->user()->role->asset_management;
+            if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
 
             $request->validate([
                 'owner_id' => 'required|uuid',
@@ -58,9 +58,10 @@ class AssetController extends Controller
             $asset->qrCode()->create([
                 'path' => $qrCodeUrl
             ]);
+            
         } else {
             $access = auth()->user()->role->asset_management;
-            if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
+            if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
             $request->validate([
                 'purchase_id' => 'required|integer',
                 'items' => 'required|array'

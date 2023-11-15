@@ -74,16 +74,17 @@ class SparePartPurchaseController extends Controller
 
         Pdf::loadView('purchase_document', [
             'purchase' => $data
-        ])->setPaper('a5', 'landscape')->save($pdfPath . '/' . $sparepartPurchase->id . '.pdf');
+        ])->setPaper('a5', 'landscape')->save($pdfPath . '/' . 'spare-part-' . $sparepartPurchase->id . '.pdf');
 
-        $pdfFullPath = $pdfPath . '/' . $sparepartPurchase->id . '.pdf';
+        $pdfFullPath = $pdfPath . '/' . 'spare-part-' . $sparepartPurchase->id . '.pdf';
 
         $sparepartPurchase->update(['doc_path' => $pdfFullPath]);
 
         return response()->json(['message' => 'Berhasil Terbuat'], 201);
     }
 
-    public function getPurchases() {
+    public function getPurchases()
+    {
         $user = User::where('id', auth()->user()->id)->first();
         $access = $user->role->asset_purchasing;
         if (!$access) return response()->json(['message' => 'forbidden'], 403);
@@ -91,7 +92,7 @@ class SparePartPurchaseController extends Controller
         $purchases = SparePartPurchase::orderBy('status_id', 'asc')
             ->orderBy('created_at', 'asc')
             ->paginate(10);
-        
+
         return SparePartPurchaseResource::collection($purchases);
     }
 
@@ -151,6 +152,4 @@ class SparePartPurchaseController extends Controller
 
         return SparePartPurchaseResource::collection($purchases);
     }
-
-    
 }

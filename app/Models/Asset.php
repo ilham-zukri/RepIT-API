@@ -88,4 +88,14 @@ class Asset extends Model
     {
         return $this->hasMany(Ticket::class, 'asset_id', 'id');
     }
+
+    /**
+     * Get all of the spareParts for the Asset
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function spareParts(): HasMany
+    {
+        return $this->hasMany(SparePart::class, 'device_id', 'id');
+    }
 }

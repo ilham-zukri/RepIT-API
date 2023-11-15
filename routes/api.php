@@ -9,9 +9,11 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AssetTypeController;
-use App\Http\Controllers\SparePartPurchaseController;
+use App\Http\Controllers\SparePartController;
+use App\Http\Controllers\SparePartTypeController;
 use App\Http\Controllers\TicketCategoryController;
 use App\Http\Controllers\SparePartRequestController;
+use App\Http\Controllers\SparePartPurchaseController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -29,15 +31,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/requests', [RequestController::class, 'getRequests']);
     Route::get('/my-requests', [RequestController::class, 'getMyRequests']);
 
+    Route::get('spare-parts/types', [SparePartTypeController::class, 'getTypes']);
     Route::post('/spare-parts/request', [SparePartRequestController::class, 'makeSparepartRequest']);
     Route::get('/spare-parts/requests', [SparePartRequestController::class, 'getSparepartRequests']);
     Route::put('/spare-parts/request/approve', [SparePartRequestController::class, 'approveSparepartRequest']);
 
-    Route::post('/spare-parts/puchase', [SparePartPurchaseController::class, 'makePurchase']);
+    Route::post('/spare-parts/purchase', [SparePartPurchaseController::class, 'makePurchase']);
     Route::get('/spare-parts/purchases', [SparePartPurchaseController::class, 'getPurchases']);
     Route::get('/spare-parts/purchases/received', [SparePartPurchaseController::class, 'getReceivedPurchases']);
     Route::put('/spare-parts/purchase/cancel', [SparePartPurchaseController::class, 'cancelPurchase']);
     Route::put('/spare-parts/purchase/receive', [SparePartPurchaseController::class, 'receivePurchase']);
+
+    Route::post('/spare-parts', [SparePartController::class, 'makeSparePart']);
+    Route::get('/spare-parts', [SparePartController::class, 'getAllSpareParts']);
 
 
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);

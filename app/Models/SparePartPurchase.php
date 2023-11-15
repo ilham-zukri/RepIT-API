@@ -51,4 +51,14 @@ class SparePartPurchase extends Model
     {
         return $this->hasMany(SparePartPurchaseDetail::class, 'purchase_id');
     }
+
+    /**
+     * Get all of the spareParts for the SparePartPurchase
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function spareParts(): HasMany
+    {
+        return $this->hasMany(SparePart::class, 'purchase_id', 'id');
+    }
 }
