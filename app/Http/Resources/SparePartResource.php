@@ -14,6 +14,17 @@ class SparePartResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "id" => $this->id,
+            "type"=> $this->type->type,
+            "brand"=> $this->brand,
+            "model"=> $this->model,
+            "serial_number"=> $this->serial_number,
+            "device_id"=> $this->device_id,
+            "created_at"=> $this->created_at->format('d/m/Y'),
+            "purchase_id"=> $this->purchase_id,
+            "qr_path"=> $this->qr_path,
+            "status"=> $this->status->status
+        ];
     }
 }
