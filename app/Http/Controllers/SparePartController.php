@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asset;
 use App\Models\SparePart;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\SparePartType;
 use App\Models\SparePartPurchase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\SparePartResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Resources\SparePartRequestResource;
-use App\Models\SparePartType;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SparePartController extends Controller
@@ -133,5 +134,33 @@ class SparePartController extends Controller
         if ($spareParts->isEmpty()) return response()->json(['message' => 'Data Spare Part Tidak Ditemukan'], 404);
 
         return SparePartResource::collection($spareParts);
+    }
+
+    public function deploySpareParts(Request $request){
+        $access = auth()->user()->role->asset_management;
+        if (!$access) return response()->json(['message' => 'Tidak Berwenang'], 403);
+
+        $request->validate([
+            'asset_id' => 'required|integer',
+            'spare_part_ids' => 'required|array',
+        ]);
+
+        $asset = Asset::find($request->asset_id);
+        if (!$asset) return response()->json(['message' => 'Asset Tidak Ditemukan'], 404);
+
+        $sparePartIds = $request->spare_part_ids;
+        
+        foreach ($sparePartIds as $sparePartId) {
+            $sparePart = SparePart::find($sparePartId);
+            if (!$sparePart) return response()->json(['message' => 'Spare Part Tidak Ditemukan'], 404);
+            if($sparePart->status_id == 3) return response()->json(['message' => 'Spare Part Sudah Deploy'], 400);
+
+            $sparePart->update([
+                'device_id' => $asset->id,
+                'status_id' => 2
+            ]);
+        }
+
+        return response()->json(["message" => "Berhasil Deploy Spare Part"], 200);
     }
 }

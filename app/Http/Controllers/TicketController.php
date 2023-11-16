@@ -100,10 +100,10 @@ class TicketController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
         $tickets = Ticket::whereHandlerId($user->id)
-        ->where('status_id', '!=', 5)
-        ->orderBy('priority_id', 'asc')
-        ->orderBy('status_id', 'asc')
-        ->orderBy('created_at', 'desc');
+            ->where('status_id', '!=', 5)
+            ->orderBy('priority_id', 'asc')
+            ->orderBy('status_id', 'asc')
+            ->orderBy('created_at', 'desc');
         $tickets = $tickets->paginate(10);
 
         if ($tickets->isEmpty()) {
@@ -190,7 +190,12 @@ class TicketController extends Controller
             'handler_note' => $request->handler_note
         ]);
 
-        return response()->json(['message' => 'Berhasil mengundur penyelasaian tiket'], 200);
+        return response()->json([
+            'message' => 'Berhasil mengundur penyelasaian tiket',
+            'data' => [
+                'status' => $ticket->status->status
+            ]
+        ], 200);
     }
 
     public function ToBeReviewedTicket(Request $request)

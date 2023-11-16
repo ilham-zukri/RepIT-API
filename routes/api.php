@@ -44,6 +44,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::post('/spare-parts', [SparePartController::class, 'makeSparePart']);
     Route::get('/spare-parts', [SparePartController::class, 'getAllSpareParts']);
+    Route::put('/spare-parts/deploy', [SparePartController::class, 'deploySpareParts']);
 
 
     Route::post('/asset/create', [AssetController::class, 'makeAsset']);

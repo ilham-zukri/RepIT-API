@@ -35,7 +35,8 @@ class TicketResource extends JsonResource
             'responded_at' => $this->responded_at ? $this->responded_at->format('d/m/Y | H:i') : null,
             'resolved_at' => $this->resolved_at ? $this->resolved_at->format('d/m/Y | H:i') : null,
             'closed_at' => $this->closed_at ? $this->closed_at->format('d/m/Y | H:i') : null,
-            'images' => $this->images
+            'images' => $this->images,  
+            'note' => $this->note
         ];
     }
 }
