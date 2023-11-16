@@ -164,6 +164,13 @@ class AssetController extends Controller
             'status_id' => 2,
             'deployed_at' => date('Y-m-d')
         ]);
+
+        if($asset->purchase_id){
+            $asset->purchase->request()->update([
+                'status_id' => 4
+            ]);
+        }
+
         return response()->json(
             [
                 'message' => 'Berhasil',

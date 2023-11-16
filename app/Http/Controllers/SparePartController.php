@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\SparePartResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Http\Resources\SparePartRequestResource;
+use App\Models\SparePartType;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class SparePartController extends Controller
@@ -42,7 +43,7 @@ class SparePartController extends Controller
             $request->validate([
                 'purchase_id' => 'required|integer',
                 'items' => 'required|array',
-                'items.*.type_id' => 'required|integer',
+                'items.*.type' => 'required|string',
             ]);
 
             $purchase = SparePartPurchase::with('items')->find($request->purchase_id);
@@ -91,12 +92,18 @@ class SparePartController extends Controller
                 $qrCodeUrl = Storage::url($qrCodePath);
 
                 $item['qr_path'] = $qrCodeUrl;
+                $item['type_id'] = SparePartType::where('type', $item['type'])->pluck('id')->first();
+                unset($item['type']);
 
                 $purchase->spareParts()->create($item);
             }
 
             $purchase->update([
                 'status_id' => 3
+            ]);
+
+            $purchase->request()->update([
+                'status_id' => 4
             ]);
         }
 

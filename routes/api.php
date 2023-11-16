@@ -41,7 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/spare-parts/purchases/received', [SparePartPurchaseController::class, 'getReceivedPurchases']);
     Route::put('/spare-parts/purchase/cancel', [SparePartPurchaseController::class, 'cancelPurchase']);
     Route::put('/spare-parts/purchase/receive', [SparePartPurchaseController::class, 'receivePurchase']);
-
+    
     Route::post('/spare-parts', [SparePartController::class, 'makeSparePart']);
     Route::get('/spare-parts', [SparePartController::class, 'getAllSpareParts']);
 
