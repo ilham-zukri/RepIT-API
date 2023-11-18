@@ -25,6 +25,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/users/by-department', [AuthController::class, 'getUsersByDep']);
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::post('/user/create', [AuthController::class, 'addUser']);
+    Route::get('/user/roles', [AuthController::class, 'getRole']);
 
     Route::post('/request/create', [RequestController::class, 'makeRequest']);
     Route::put('/request/approve', [RequestController::class, 'approveRequest']);
@@ -55,6 +56,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/asset/myAssets', [AssetController::class, 'myAssets']);
     Route::get('/assets', [AssetController::class, 'getAllAssets']);
     Route::put('/asset/accept', [AssetController::class, 'acceptAsset']);
+    Route::get('/asset/ticket-history', [AssetController::class, 'getAssetTicketHistory']);
+    Route::get('/asset/attached-spare-parts', [AssetController::class, 'getAssetAttachedSpareParts']);
 
     Route::post('/purchase', [PurchaseController::class, 'makePurchaseFromRequest']);
     Route::get('/purchases', [PurchaseController::class, 'getPurchases']);

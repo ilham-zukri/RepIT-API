@@ -19,7 +19,7 @@ class TicketController extends Controller
             'description' => 'required|string',
             'ticket_category_id' => 'required|integer',
             'images' => 'array',
-            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048'
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:6144'
         ]);
 
         if ($request->ticket_category_id == 1) {

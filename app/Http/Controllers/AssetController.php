@@ -10,7 +10,9 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\AssetResource;
+use App\Http\Resources\TicketResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\SparePartResource;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AssetController extends Controller
@@ -193,5 +195,30 @@ class AssetController extends Controller
         }
 
         return AssetResource::collection($assets);
+    }
+
+    function getAssetTicketHistory(Request $request){
+        $request->validate([
+            'asset_id' => 'required|integer'
+        ]);
+        $assetId = $request->query('asset_id');
+        $asset = Asset::find($assetId);
+        if(!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+        $tickets = $asset->tickets()->paginate(10);
+        if($tickets->isEmpty()) return response()->json(['message' => 'Belum ada tiket yang terbuat'], 404);
+        return TicketResource::collection($tickets);   
+    }
+
+    function getAssetAttachedSpareParts(Request $request){
+        $request->validate([
+            'asset_id' => 'required|integer'
+        ]);
+
+        $assetId = $request->query('asset_id');
+        $asset = Asset::find($assetId);
+        if(!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+        $spareParts = $asset->spareParts()->paginate(10);
+        if($spareParts->isEmpty()) return response()->json(['message' => 'Belum ada Spare Part yang digunakan'], 404);
+        return SparePartResource::collection($spareParts);
     }
 }

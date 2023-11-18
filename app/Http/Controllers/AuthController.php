@@ -123,4 +123,9 @@ class AuthController extends Controller
 
         return response()->json(['data' => $users], 200);
     }
+
+    public function getRole(){
+        $role = auth()->user()->role;
+        return response()->json(['data' => $role], 200);
+    }
 }
