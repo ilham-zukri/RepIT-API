@@ -113,7 +113,7 @@ class AssetController extends Controller
                 $item['ram'] = $item['ram'] ?? '#N/A';
 
                 $asset = $purchase->assets()->create($item);
-                $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .3)->margin(0)->size(300)->generate($asset->qr_code);
+                $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .2)->margin(0)->size(300)->generate($asset->qr_code);
 
                 // Simpan QR Code di direktori publik
                 $qrCodePath = 'public/qrcodes/' . $asset->qr_code . '.png';
@@ -209,7 +209,7 @@ class AssetController extends Controller
         return TicketResource::collection($tickets);   
     }
 
-    function getAssetAttachedSpareParts(Request $request){
+    public function getAssetAttachedSpareParts(Request $request){
         $request->validate([
             'asset_id' => 'required|integer'
         ]);
@@ -221,4 +221,15 @@ class AssetController extends Controller
         if($spareParts->isEmpty()) return response()->json(['message' => 'Belum ada Spare Part yang digunakan'], 404);
         return SparePartResource::collection($spareParts);
     }
+
+    public function getAssetByQRCode(Request $request){
+        $request->validate([
+            'qr_code' => 'required|string'
+        ]);
+
+        $asset = Asset::where('qr_code', $request->qr_code)->first();
+
+        return new AssetResource($asset);
+    }
+    
 }

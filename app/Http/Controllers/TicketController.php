@@ -71,7 +71,10 @@ class TicketController extends Controller
                 ->orderBy('created_at', 'desc');
         }
 
-        $tickets = $ticketsQuery->paginate(10);
+        $tickets = $ticketsQuery
+        ->orderByRaw('CASE WHEN flag_id = 1 THEN 0 ELSE 1 END')
+        ->paginate(10);
+        
         return TicketResource::collection($tickets);
     }
 
