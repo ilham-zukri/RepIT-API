@@ -93,6 +93,16 @@ class Ticket extends Model
         return $this->hasMany(TicketsImage::class, 'ticket_id', 'id');
     }
 
+    /**
+     * Get the flag that owns the Ticket
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function flag(): BelongsTo
+    {
+        return $this->belongsTo(Flag::class, 'flag_id', 'id');
+    }
+
     protected $casts = [
         'responded_at' => 'datetime',
         'resolved_at' => 'datetime',

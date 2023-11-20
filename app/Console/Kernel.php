@@ -13,6 +13,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
         // $schedule->command('inspire')->hourly();
+        $schedule->command('tickets:check-ticket-response-time')->everyFiveMinutes()->appendOutputTo(storage_path('logs/scheduler.log')); 
+        $schedule->command('tickets:check-ticket-resolve-time')->hourly()->appendOutputTo(storage_path('logs/scheduler.log'));
     }
 
     /**
