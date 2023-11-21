@@ -19,7 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/user/current', [AuthController::class, 'getCurrentUser']);
 
-    Route::get('/user', [AuthController::class, 'getUsers']);
+    Route::get('/users', [AuthController::class, 'getUsers']);
     Route::put('/user/user-name', [AuthController::class, 'changeUname']);
     Route::put('/user/email', [AuthController::class, 'changeEmail']);
     Route::get('/users/by-department', [AuthController::class, 'getUsersByDep']);

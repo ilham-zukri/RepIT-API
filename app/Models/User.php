@@ -29,7 +29,7 @@ class User extends Authenticatable
         'employee_id',
         'full_name',
         'branch_id',
-        'department',
+        'department_id',
         'role_id',
         'active'
     ];
@@ -112,6 +112,16 @@ class User extends Authenticatable
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class, 'created_by_id', 'id');
+    }
+
+    /**
+     * Get the department that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id', 'id');
     }
 
     /**

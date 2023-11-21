@@ -50,19 +50,20 @@ class AuthController extends Controller
             'user_name' => 'required|string',
             'password' => 'required|min:8',
             'branch_id' => 'required|integer',
-            'department' => 'required|string',
+            'department_id' => 'required|integer',
         ]);
 
         $_request  = $request->all();
-        $_request['password'] = Hash::make($request->password); 
+        $_request['password'] = Hash::make($request->password);
         $_request['user_name'] = strtolower($request->user_name);
 
         User::create($_request);
 
-        return response()->json(['message' => 'user created'], 201);
+        return response()->json(['message' => 'User Terbuat'], 201);
     }
 
-    public function changeUname(Request $request) {
+    public function changeUname(Request $request)
+    {
         $user = User::whereId(auth()->user()->id)->firstOrFail();
 
         $request->validate([
@@ -70,7 +71,7 @@ class AuthController extends Controller
         ]);
 
         $existed = User::whereUserName($request->user_name)->first();
-        if($existed) return response()->json(['message' => 'username sudah digunakan'], 409); 
+        if ($existed) return response()->json(['message' => 'username sudah digunakan'], 409);
 
         $user->update([
             'user_name' => strtolower($request->user_name)
@@ -79,14 +80,15 @@ class AuthController extends Controller
         return response()->json(['message' => 'berhasil'], 200);
     }
 
-    public function changeEmail(Request $request){
+    public function changeEmail(Request $request)
+    {
         $user = User::whereId(auth()->user()->id)->firstOrFail();
         $request->validate([
             'email' => 'required|email'
         ]);
 
         $existed = User::whereEmail($request->email)->first();
-        if($existed) return response()->json(['message' => 'email sudah digunakan'], 409);
+        if ($existed) return response()->json(['message' => 'email sudah digunakan'], 409);
 
         $user->update([
             'email' => strtolower($request->email)
@@ -101,20 +103,35 @@ class AuthController extends Controller
         return new UserResource($user);
     }
 
-    public function getUsers()
+    public function getUsers(Request $request)
     {
-        $currentUser = Auth::user();
-        $users = User::with('role:id,role_name,asset_request,asset_approval,knowledge_base,user_management')->get();
-        return ($currentUser->role->user_management) ? ['users' => UserResource::collection($users)] : response()->json(['message' => 'unauthorized'], 401);
+        $access = auth()->user()->role->user_management;
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
+        
+        $query = $request->query('user_name');
+        if ($query) {
+            $user = User::where('user_name', 'LIKE', "%{$query}%")->paginate(10);
+        } else {
+            $user = User::paginate(10);
+        }
+        return UserResource::collection($user);
     }
 
-    public function getUsersByDep() : JsonResponse | AnonymousResourceCollection{
+    public function getUsersByDep(): JsonResponse | AnonymousResourceCollection
+    {
         $access = (auth()->user()->role->asset_request);
-        if(!$access) return response()->json(['message' => 'tidak berwenang'], 403);
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
 
-        $users = User::whereDepartment(auth()->user()->department)->select('id', 'user_name')->get();
-        $loggedIn = User::whereId(auth()->user()->id)->select('id', 'user_name')->first();
-        
+        $users = User::where('active', 1)
+            ->where('branch_id', auth()->user()->branch_id)
+            ->whereDepartmentId(auth()->user()->department_id)
+            ->select('id', 'user_name')
+            ->get();
+
+        $loggedIn = User::whereId(auth()->user()->id)
+            ->select('id', 'user_name')
+            ->first();
+
         $users = $users->filter(function ($user) use ($loggedIn) {
             return $user->id !== $loggedIn->id;
         });
@@ -124,7 +141,8 @@ class AuthController extends Controller
         return response()->json(['data' => $users], 200);
     }
 
-    public function getRole(){
+    public function getRole()
+    {
         $role = auth()->user()->role;
         return response()->json(['data' => $role], 200);
     }

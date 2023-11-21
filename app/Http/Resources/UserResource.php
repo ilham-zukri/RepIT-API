@@ -30,7 +30,8 @@ class UserResource extends JsonResource
             'full_name' => $this->full_name,
             'email' => $this->email,
             'branch' => $this->branch->name,
-            'department' => $this->department
+            'department' => $this->department->department,
+            'created_at' => $this->created_at->format('d/m/Y'),
         ];
     }
 }
