@@ -10,6 +10,7 @@ use App\Http\Controllers\PriorityController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\SparePartController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\SparePartTypeController;
 use App\Http\Controllers\TicketCategoryController;
 use App\Http\Controllers\SparePartRequestController;
@@ -26,6 +27,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::post('/user/create', [AuthController::class, 'addUser']);
     Route::get('/user/roles', [AuthController::class, 'getRole']);
+    Route::get('/roles', [AuthController::class, 'getRolesForList']);
 
     Route::post('/request/create', [RequestController::class, 'makeRequest']);
     Route::put('/request/approve', [RequestController::class, 'approveRequest']);
@@ -80,6 +82,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::get('/priorities', [PriorityController::class, 'getPriorities']);
+    Route::get('/departments', [DepartmentController::class, 'getDepartmentsForList']);
     Route::get('/ticket-categories', [TicketCategoryController::class, 'getCategories']);
 });
 

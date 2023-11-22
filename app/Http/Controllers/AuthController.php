@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UserByDeptResource;
-use App\Http\Resources\UserResource;
+use App\Models\Role;
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\JsonResponse;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Resources\UserByDeptResource;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AuthController extends Controller
 {
@@ -145,5 +146,14 @@ class AuthController extends Controller
     {
         $role = auth()->user()->role;
         return response()->json(['data' => $role], 200);
+    }
+
+    public function getRolesForList(){
+        $access = auth()->user()->role->user_management;
+        if (!$access) return response()->json(['message' => 'forbidden'], 403);
+
+        $roles = Role::select('id', 'role_name')->get();
+
+        return response()->json($roles, 200);
     }
 }
