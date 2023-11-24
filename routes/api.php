@@ -21,13 +21,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user/current', [AuthController::class, 'getCurrentUser']);
 
     Route::get('/users', [AuthController::class, 'getUsers']);
-    Route::put('/user/user-name', [AuthController::class, 'changeUname']);
-    Route::put('/user/email', [AuthController::class, 'changeEmail']);
     Route::get('/users/by-department', [AuthController::class, 'getUsersByDep']);
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::post('/user/create', [AuthController::class, 'addUser']);
     Route::get('/user/roles', [AuthController::class, 'getRole']);
     Route::get('/roles', [AuthController::class, 'getRolesForList']);
+
+    Route::put('/user', [AuthController::class, 'editUser']);
+    Route::put('/user/active', [AuthController::class, 'setActive']);
+    Route::put('/user/user-name', [AuthController::class, 'changeUname']);
+    Route::put('/user/full-name', [AuthController::class, 'changeFullName']);
+    Route::put('/user/email', [AuthController::class, 'changeEmail']);
+    Route::put('/user/password', [AuthController::class, 'changePassword']);
+    Route::put('/user/password/reset', [AuthController::class, 'resetPassword']);
+    Route::put('/user/role', [AuthController::class, 'changeRole']);
+    Route::put('/user/branch', [AuthController::class, 'changeBranch']);
+    Route::put('/user/department', [AuthController::class, 'changeDepartment']);
+
+
 
     Route::post('/request/create', [RequestController::class, 'makeRequest']);
     Route::put('/request/approve', [RequestController::class, 'approveRequest']);
