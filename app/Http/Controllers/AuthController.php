@@ -243,7 +243,7 @@ class AuthController extends Controller
         if (!$access) return response()->json(['message' => 'forbidden'], 403);
 
         $request->validate([
-            'user_id' => 'required|string',
+            'user_id' => '  required|string',
         ]);
 
         $user = User::whereId($request->user_id)->firstOrFail();

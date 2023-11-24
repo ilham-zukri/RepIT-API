@@ -229,7 +229,8 @@ class TicketController extends Controller
 
         $ticket->update([
             'status_id' => 4,
-            'resolved_at' => now()
+            'resolved_at' => now(),
+            'flag_id' => null
         ]);
 
         return response()->json([
