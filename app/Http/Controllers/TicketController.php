@@ -163,6 +163,14 @@ class TicketController extends Controller
             'status_id' => 3
         ]);
 
+        if($ticket->asset_id){
+            $asset = $ticket->asset;
+            $asset->update([
+                'status_id' => 3
+            ]);
+        }
+            
+
         return response()->json([
             'message' => 'Berhasil',
             'data' => [
@@ -262,6 +270,13 @@ class TicketController extends Controller
             'status_id' => 5,
             'closed_at' => now()
         ]);
+
+        if($ticket->asset_id){
+            $asset = $ticket->asset;
+            $asset->update([
+                'status_id' => 2
+            ]);
+        }
 
         return response()->json([
             'message' => 'Tiket berhasil ditutup',

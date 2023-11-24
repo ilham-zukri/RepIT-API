@@ -60,7 +60,6 @@ class AssetController extends Controller
             $asset->qrCode()->create([
                 'path' => $qrCodeUrl
             ]);
-            
         } else {
             $access = auth()->user()->role->asset_management;
             if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
@@ -144,11 +143,11 @@ class AssetController extends Controller
     {
         $user = User::where('id', auth()->user()->id)->first();
         $assets = $user->assets()->select('id', 'model')->get();
-        
+
         return response()->json($assets, 200);
     }
 
-    function acceptAsset(Request $request): JsonResponse
+    public function acceptAsset(Request $request): JsonResponse
     {
         $request->validate([
             'asset_id' => 'required|integer'
@@ -167,7 +166,7 @@ class AssetController extends Controller
             'deployed_at' => date('Y-m-d')
         ]);
 
-        if($asset->purchase_id){
+        if ($asset->purchase_id) {
             $asset->purchase->request()->update([
                 'status_id' => 4
             ]);
@@ -182,7 +181,28 @@ class AssetController extends Controller
         );
     }
 
-    function getAllAssets(Request $request)
+    public function scrapAsset(Request $request)
+    {
+        $access = auth()->user()->role->asset_management;
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
+
+        $request->validate([
+            'asset_id' => 'required|integer'
+        ]);
+
+        $asset = Asset::whereId($request->asset_id)->first();
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+
+        $asset->update([
+            'status_id' => 5,
+            'scrapped_at' => now(),
+            'owner_id' => null
+        ]);
+
+        return response()->json(['message' => 'Asset Scrapped', 'data' => ['status' => $asset->status->status]], 200);
+    }
+
+    public function getAllAssets(Request $request)
     {
         $access = auth()->user()->role->asset_management || auth()->user()->role->asset_request;
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
@@ -197,32 +217,35 @@ class AssetController extends Controller
         return AssetResource::collection($assets);
     }
 
-    function getAssetTicketHistory(Request $request){
+    function getAssetTicketHistory(Request $request)
+    {
         $request->validate([
             'asset_id' => 'required|integer'
         ]);
         $assetId = $request->query('asset_id');
         $asset = Asset::find($assetId);
-        if(!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
         $tickets = $asset->tickets()->paginate(10);
-        if($tickets->isEmpty()) return response()->json(['message' => 'Belum ada tiket yang terbuat'], 404);
-        return TicketResource::collection($tickets);   
+        if ($tickets->isEmpty()) return response()->json(['message' => 'Belum ada tiket yang terbuat'], 404);
+        return TicketResource::collection($tickets);
     }
 
-    public function getAssetAttachedSpareParts(Request $request){
+    public function getAssetAttachedSpareParts(Request $request)
+    {
         $request->validate([
             'asset_id' => 'required|integer'
         ]);
 
         $assetId = $request->query('asset_id');
         $asset = Asset::find($assetId);
-        if(!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
         $spareParts = $asset->spareParts()->paginate(10);
-        if($spareParts->isEmpty()) return response()->json(['message' => 'Belum ada Spare Part yang digunakan'], 404);
+        if ($spareParts->isEmpty()) return response()->json(['message' => 'Belum ada Spare Part yang digunakan'], 404);
         return SparePartResource::collection($spareParts);
     }
 
-    public function getAssetByQRCode(Request $request){
+    public function getAssetByQRCode(Request $request)
+    {
         $request->validate([
             'qr_code' => 'required|string'
         ]);
@@ -231,5 +254,4 @@ class AssetController extends Controller
 
         return new AssetResource($asset);
     }
-    
 }
