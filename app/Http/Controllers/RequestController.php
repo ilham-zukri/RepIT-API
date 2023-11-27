@@ -28,10 +28,10 @@ class RequestController extends Controller
             'description' => $request->description,
             'priority_id' => $request->priority ?? 4,
             'for_user' => $request->for_user ?? auth()->user()->id,
-            'location_id' => $request->location_id ?? 1
+            'location_id' => $user->branch_id,
         ]);
 
-        return response()->json(['message' => 'berhasil'], 201);
+        return response()->json(['message' => 'Berhasil Membuat Request'], 201);
     }
 
     public function approveRequest(Request $request)

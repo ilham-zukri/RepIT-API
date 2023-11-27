@@ -49,6 +49,8 @@ class AuthController extends Controller
 
         $request->validate([
             'user_name' => 'required|string',
+            'full_name' => 'required|string',
+            'employee_id' => 'required|string',
             'password' => 'required|min:8',
             'branch_id' => 'required|integer',
             'department_id' => 'required|integer',

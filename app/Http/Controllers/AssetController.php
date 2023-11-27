@@ -208,7 +208,7 @@ class AssetController extends Controller
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
 
         if (auth()->user()->role->asset_management) {
-            $assets = Asset::paginate(10);
+            $assets = Asset::orderBy('status_id', 'asc')->paginate(10);
         } else {
             $usersWithMatchingDepartment = User::where('department', auth()->user()->department)->pluck('id');
             $assets = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment)->paginate(10);
