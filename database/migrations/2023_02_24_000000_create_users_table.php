@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('user_name')->unique();
             $table->string('password');
             $table->unsignedBigInteger('role_id')->default(3);
-            $table->string('employee_id', 100)->nullable();
+            $table->string('employee_id', 100)->nullable()->unique();
             $table->string('full_name', 100)->nullable();
             $table->string('email')->nullable()->unique();
             $table->unsignedBigInteger('branch_id');

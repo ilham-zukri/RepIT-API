@@ -3,18 +3,20 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
-    public $incrementing = false;    
+    use HasApiTokens, HasFactory, Notifiable, Searchable;
+    public $incrementing = false;
     protected $keyType = 'string';
 
     /**
@@ -33,6 +35,9 @@ class User extends Authenticatable
         'role_id',
         'active'
     ];
+
+
+    
 
     /**
      * Get the user that owns the User
@@ -122,6 +127,15 @@ class User extends Authenticatable
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id', 'id');
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'user_name' => '',
+            'full_name' => '',
+            'employee_id' => '',
+        ];
     }
 
     /**

@@ -266,15 +266,13 @@ class AuthController extends Controller
         $access = auth()->user()->role->user_management;
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
 
-        $query = $request->query('user_name');
-        if ($query) {
-            $user = User::where('user_name', 'LIKE', "%{$query}%")
-                ->orderBy('active', 'desc')
-                ->paginate(10);
+        $searchParam = $request->query('search_param');
+        if ($searchParam) {
+            $users = User::search($searchParam)->paginate(10);
         } else {
-            $user = User::orderBy('active', 'desc')->paginate(10);
+            $users = User::orderBy('active', 'desc')->paginate(10);
         }
-        return UserResource::collection($user);
+        return UserResource::collection($users);
     }
 
     public function getUsersByDep(): JsonResponse | AnonymousResourceCollection

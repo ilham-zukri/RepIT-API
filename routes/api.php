@@ -80,6 +80,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/purchase/generate-pdf', [PurchaseController::class, 'generatePurchaseDocument']);
     Route::put('/purchase/cancel', [PurchaseController::class, 'cancelPurchase']);
     Route::put('/purchase/receive', [PurchaseController::class, 'receivePurchase']);
+    Route::get('/purchase/assets', [PurchaseController::class, 'getPurchasedAssets']);
 
     Route::post('/ticket', [TicketController::class, 'createTicket']);
     Route::get('/tickets', [TicketController::class, 'getAllTickets']);

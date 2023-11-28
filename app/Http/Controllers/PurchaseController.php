@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Dompdf\Dompdf;
 use App\Models\User;
 use App\Models\Asset;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\AssetResource;
 use App\Models\Request as AssetRequest;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\PurchaseResource;
 use App\Http\Resources\PurchaseListResource;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Storage;
 
 class PurchaseController extends Controller
 {
@@ -128,9 +129,6 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'berhasil'], 200);
     }
 
-
-
-
     public function receivePurchase(Request $request): JsonResponse
     {
         $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
@@ -161,5 +159,16 @@ class PurchaseController extends Controller
         if (!$purchases->first()) return response()->json(['message' => 'Belum ada pembelian yang diterima'], 404);
 
         return PurchaseListResource::collection($purchases);
+    }
+
+    public function getPurchasedAssets(Request $request)
+    {
+        $access = auth()->user()->role->asset_purchasing;
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+
+        $assets = Asset::where('purchase_id', $request->id)->get();
+        if (!$assets->first()) return response()->json(['message' => 'Belum ada asset yang diterima'], 404);
+
+        return AssetResource::collection($assets);
     }
 }

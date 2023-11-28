@@ -128,6 +128,12 @@ class AssetController extends Controller
             $purchase->update([
                 'status_id' => 3
             ]);
+
+            $purchase->request()->update(
+                [
+                    'status_id' => 4
+                ]
+            );
         }
         return response()->json(['message' => 'Data Aset Telah Dibuat'], 201);
     }
