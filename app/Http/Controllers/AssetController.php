@@ -49,6 +49,12 @@ class AssetController extends Controller
                 'status_id' => 1,
             ]);
 
+            $name = 'SM-' . $asset->created_at->year . '-' . $asset->created_at->month . '-' . $asset->id;
+
+            $asset->update([
+                'name' => $name
+            ]);
+
             $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .3)->margin(0)->size(300)->generate($asset->qr_code);
 
             // Simpan QR Code di direktori publik
@@ -112,6 +118,13 @@ class AssetController extends Controller
                 $item['ram'] = $item['ram'] ?? '#N/A';
 
                 $asset = $purchase->assets()->create($item);
+                
+                $name = 'SM-' . $asset->created_at->year . '-' . $asset->created_at->month . '-' . $asset->id;
+
+                $asset->update([
+                    'name' => $name
+                ]);
+
                 $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .2)->margin(0)->size(300)->generate($asset->qr_code);
 
                 // Simpan QR Code di direktori publik
