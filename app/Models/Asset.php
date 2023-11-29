@@ -14,6 +14,7 @@ class Asset extends Model
 
     protected $fillable = [
         'owner_id',
+        'name',
         'asset_type',
         'brand',
         'model',
