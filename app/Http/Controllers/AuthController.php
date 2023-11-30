@@ -283,11 +283,11 @@ class AuthController extends Controller
         $users = User::where('active', 1)
             ->where('branch_id', auth()->user()->branch_id)
             ->whereDepartmentId(auth()->user()->department_id)
-            ->select('id', 'user_name')
+            ->select('id', 'full_name')
             ->get();
 
         $loggedIn = User::whereId(auth()->user()->id)
-            ->select('id', 'user_name')
+            ->select('id', 'full_name')
             ->first();
 
         $users = $users->filter(function ($user) use ($loggedIn) {
@@ -297,6 +297,24 @@ class AuthController extends Controller
         $users->prepend($loggedIn);
 
         return response()->json(['data' => $users], 200);
+    }
+
+    public function getUsersByLocationAndDep(Request $request)
+    {
+        $access = (auth()->user()->role->asset_request);
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
+
+        $branchId = $request->query('branch_id');
+        $departmentId = $request->query('department_id');
+
+        $users = User::where('active', 1)
+        ->where('branch_id', $branchId)
+        ->where('department_id', $departmentId)
+        ->get();
+
+        if (count($users) == 0) return response()->json(['message' => 'data user tidak ditemukan'], 404);
+
+        return UserByDeptResource::collection($users);
     }
 
     public function getRole()

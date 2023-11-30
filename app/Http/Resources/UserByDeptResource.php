@@ -16,7 +16,7 @@ class UserByDeptResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_name' => $this->user_name
+            'full_name' => $this->full_name
         ];
     }
 }

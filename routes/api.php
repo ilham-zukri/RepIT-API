@@ -22,6 +22,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/users', [AuthController::class, 'getUsers']);
     Route::get('/users/by-department', [AuthController::class, 'getUsersByDep']);
+    Route::get('/users/by-location-department', [AuthController::class, 'getUsersByLocationAndDep']);
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::post('/user/create', [AuthController::class, 'addUser']);
     Route::get('/user/roles', [AuthController::class, 'getRole']);
@@ -73,6 +74,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/asset/attached-spare-parts', [AssetController::class, 'getAssetAttachedSpareParts']);
     Route::get('/asset/qr-code', [AssetController::class, 'getAssetByQRCode']);
     Route::put('/asset/scrap', [AssetController::class, 'scrapAsset']);
+    Route::put('/asset/transfer', [AssetController::class, 'transferAsset']);
 
     Route::post('/purchase', [PurchaseController::class, 'makePurchaseFromRequest']);
     Route::get('/purchases', [PurchaseController::class, 'getPurchases']);

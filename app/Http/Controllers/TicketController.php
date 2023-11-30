@@ -259,12 +259,7 @@ class TicketController extends Controller
         $ticket = Ticket::find($request->ticket_id);
         if (!$ticket) return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
 
-        if ($ticket->asset_id) {
-            $asset = $ticket->asset;
-            if ($asset->owner_id != $user->id) return response()->json(['message' => 'Forbidden'], 403);
-        } else {
-            if ($ticket->created_by_id != $user->id) return response()->json(['message' => 'Forbidden'], 403);
-        }
+        if ($ticket->created_by_id != $user->id) return response()->json(['message' => 'Forbidden'], 403);
 
         $ticket->update([
             'status_id' => 5,

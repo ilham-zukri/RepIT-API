@@ -118,7 +118,7 @@ class AssetController extends Controller
                 $item['ram'] = $item['ram'] ?? '#N/A';
 
                 $asset = $purchase->assets()->create($item);
-                
+
                 $name = 'SM-' . $asset->created_at->year . '-' . $asset->created_at->month . '-' . $asset->id;
 
                 $asset->update([
@@ -178,7 +178,7 @@ class AssetController extends Controller
         if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
         if ($asset->status_id != 1) return response()->json(['message' => 'Asset Sudah di deploy'], 400);
 
-        if ($user->id != $asset->owner_id) return response()->json(['message' => 'forbidden'], 403);
+        if ($user->id != $asset->owner_id) return response()->json(['message' => 'Bukan Penerima'], 403);
 
         $asset->update([
             'status_id' => 2,
@@ -219,6 +219,36 @@ class AssetController extends Controller
         ]);
 
         return response()->json(['message' => 'Asset Scrapped', 'data' => ['status' => $asset->status->status]], 200);
+    }
+
+    public function transferAsset(Request $request)
+    {
+        $access = auth()->user()->role->asset_management;
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
+
+        $request->validate([
+            'asset_id' => 'required|integer',
+            'user_id' => 'required|string',
+            'utilization' => 'required|string'
+        ]);
+
+        $asset = Asset::find($request->asset_id);
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+
+
+        if ($asset->status_id != 2 && $asset->status_id != 4) return response()->json(['message' => 'Asset tidak tersedia'], 400);
+
+        $user = User::find($request->user_id);
+        if (!$user) return response()->json(['message' => 'User tidak ditemukan'], 404);
+
+        $asset->update([
+            'owner_id' => $user->id,
+            'location_id' => $user->branch_id,
+            'utilization' => $request->utilization,
+            'deployed_at' => now()
+        ]);
+
+        return response()->json(['message' => 'Berhasil memindahkan asset'], 200);
     }
 
     public function getAllAssets(Request $request)
