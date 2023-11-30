@@ -263,7 +263,7 @@ class TicketController extends Controller
 
         $ticket->update([
             'status_id' => 5,
-            'closed_at' => now()
+            'closed_at' => now() 
         ]);
 
         if($ticket->asset_id){

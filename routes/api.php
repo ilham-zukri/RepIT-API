@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/asset/qr-code', [AssetController::class, 'getAssetByQRCode']);
     Route::put('/asset/scrap', [AssetController::class, 'scrapAsset']);
     Route::put('/asset/transfer', [AssetController::class, 'transferAsset']);
+    Route::put('/asset/reserve', [AssetController::class, 'reserveAsset']);
 
     Route::post('/purchase', [PurchaseController::class, 'makePurchaseFromRequest']);
     Route::get('/purchases', [PurchaseController::class, 'getPurchases']);

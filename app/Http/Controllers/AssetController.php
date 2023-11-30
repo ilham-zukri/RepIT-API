@@ -245,10 +245,40 @@ class AssetController extends Controller
             'owner_id' => $user->id,
             'location_id' => $user->branch_id,
             'utilization' => $request->utilization,
+            'status_id' => 2,   
             'deployed_at' => now()
         ]);
 
         return response()->json(['message' => 'Berhasil memindahkan asset'], 200);
+    }
+
+    public function reserveAsset(Request $request)
+    {
+        $access = auth()->user()->role->asset_management;
+        if (!$access) return response()->json(['message' => 'tidak berwenang'], 403);
+
+        $request->validate([
+            'asset_id' => 'required|integer'
+        ]);
+
+        $asset = Asset::find($request->asset_id);
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
+
+        if ($asset->status_id != 2) return response()->json(['message' => 'Asset tidak bisa diambil'], 400);
+
+        $asset->update([
+            'owner_id' => null,
+            'status_id' => 4,
+            'location_id' => 1,
+            'deployed_at' => null
+        ]);
+
+        return response()->json([
+            'message' => 'Berhasil mengambil asset sebagai cadangan',
+            'data' => [
+                'status' => $asset->status->status
+                ]
+        ], 200);    
     }
 
     public function getAllAssets(Request $request)
