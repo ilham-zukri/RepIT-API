@@ -20,7 +20,8 @@ class AuthController extends Controller
     {
         $request->validate([
             'user_name' => 'required',
-            'password' => 'required'
+            'password' => 'required',
+            'fcm_token' => 'nullable'
         ]);
 
         $user = User::where('user_name', strtolower($request->user_name))->first();
@@ -30,14 +31,21 @@ class AuthController extends Controller
             return response()->json(['message' => 'Credentials does not match.'], 401);
         }
 
+        if($request->fcm_token){
+            $user->update([
+                'fcm_token' => $request->fcm_token
+            ]);
+        }
+            
         return $user->createToken('user login')->plainTextToken;
     }
 
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
-
-        // return response()->json(200);
+        $request->user()->update([
+            'fcm_token' => null
+        ]);
     }
 
     public function addUser(Request $request)

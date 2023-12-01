@@ -25,6 +25,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'fcm_token',
         'user_name',
         'email',
         'password',
@@ -35,9 +36,6 @@ class User extends Authenticatable
         'role_id',
         'active'
     ];
-
-
-    
 
     /**
      * Get the user that owns the User
@@ -164,5 +162,16 @@ class User extends Authenticatable
         static::creating(function ($model) {
             $model->{$model->getKeyName()} = (string) Str::uuid();
         });
+    }
+
+    /**
+     * Specifies the user's FCM token
+     *
+     * @return string|array
+     */
+    public function routeNotificationForFcm()
+    {
+        return $this->fcm_token;
+        // return $this->getDeviceTokens();
     }
 }

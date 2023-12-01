@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Facade;
+use NotificationChannels\Fcm\FcmServiceProvider;
 
 return [
 
@@ -181,6 +182,10 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        /**
+         * FCM Notifications
+         */
+        FcmServiceProvider::class,
 
         /*
          * Package Service Providers...

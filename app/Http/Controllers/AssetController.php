@@ -13,6 +13,7 @@ use App\Http\Resources\AssetResource;
 use App\Http\Resources\TicketResource;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\SparePartResource;
+use App\Notifications\SendNotification;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AssetController extends Controller
@@ -291,6 +292,12 @@ class AssetController extends Controller
         } else {
             $usersWithMatchingDepartment = User::where('department', auth()->user()->department)->pluck('id');
             $assets = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment)->paginate(10);
+        }
+
+        $users = User::where('fcm_token', '!=', null)->get();
+
+        foreach ($users as $user) {
+            $user->notify(new SendNotification);
         }
 
         return AssetResource::collection($assets);
