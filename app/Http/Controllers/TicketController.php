@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\TicketResource;
 use App\Models\Asset;
 use App\Models\Ticket;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Resources\TicketResource;
+use App\Models\User;
+use App\Notifications\SendNotification;
 
 class TicketController extends Controller
 {
@@ -49,6 +51,23 @@ class TicketController extends Controller
             }
         }
 
+        $itsQ =User::where('role_id', 4)->orWhere('role_id',5);
+
+        if($ticket->ticket_category_id == 2){
+            $itsQ = User::where('role_id', 5);
+        }
+
+        $its = $itsQ->get();
+        
+        foreach ($its as $it) {
+            if($it->fcm_token != null){
+                $it->notify(new SendNotification(
+                    'Tiket Baru',
+                    'Tiket baru dibuat oleh ' . auth()->user()->full_name . ' dengan prioritas ' . $ticket->priority->priority,
+                    'ticket'
+                ));
+            }
+        }
         return response()->json(['message' => 'Tiket berhasil dibuat'], 201);
     }
 
@@ -72,9 +91,9 @@ class TicketController extends Controller
         }
 
         $tickets = $ticketsQuery
-        ->orderByRaw('CASE WHEN flag_id = 1 THEN 0 ELSE 1 END')
-        ->paginate(10);
-        
+            ->orderByRaw('CASE WHEN flag_id = 1 THEN 0 ELSE 1 END')
+            ->paginate(10);
+
         return TicketResource::collection($tickets);
     }
 
@@ -137,6 +156,16 @@ class TicketController extends Controller
             'responded_at' => now()
         ]);
 
+        $user = User::where('id', $ticket->created_by_id)->first();
+
+        if ($user->fcm_token != null) {
+            $user->notify(new SendNotification(
+                'Tiket Direspon',
+                'Tiket anda telah direspon oleh' . auth()->user()->full_name,
+                'ticket'
+            ));
+        }
+
         return response()->json([
             'message' => 'Berhasil ambil tiket',
             'data' => [
@@ -145,6 +174,8 @@ class TicketController extends Controller
                 'status' => $ticket->status->status
             ]
         ], 200);
+
+        
     }
 
     public function progressTicket(Request $request)
@@ -163,13 +194,23 @@ class TicketController extends Controller
             'status_id' => 3
         ]);
 
-        if($ticket->asset_id){
+        if ($ticket->asset_id) {
             $asset = $ticket->asset;
             $asset->update([
                 'status_id' => 3
             ]);
         }
-            
+
+        $user = User::where('id', $ticket->created_by_id)->first();
+
+        if ($user->fcm_token != null) {
+            $user->notify(new SendNotification(
+                'Tiket Dikerjakan',
+                'Tiket anda sedang dikerjakan oleh ' . auth()->user()->full_name,
+                'ticket'
+            ));
+        }
+
 
         return response()->json([
             'message' => 'Berhasil',
@@ -200,6 +241,16 @@ class TicketController extends Controller
         $ticket->note()->create([
             'handler_note' => $request->handler_note
         ]);
+
+        $user = User::where('id', $ticket->created_by_id)->first();
+
+        if ($user->fcm_token != null) {
+            $user->notify(new SendNotification(
+                'Tiket Ditunda',
+                'Pengerjaan tiket anda ditunda',
+                'ticket'
+            ));
+        }
 
         return response()->json([
             'message' => 'Berhasil mengundur penyelasaian tiket',
@@ -241,6 +292,16 @@ class TicketController extends Controller
             'flag_id' => null
         ]);
 
+        $user = User::where('id', $ticket->created_by_id)->first();
+
+        if ($user->fcm_token != null) {
+            $user->notify(new SendNotification(
+                'Pengerjaan selesai',
+                'Pengerjaan tiket anda sudah selesai, segera cek dan tutup tiket',
+                'ticket'
+            ));
+        }
+
         return response()->json([
             'message' => 'Tiket berhasil ditindak lanjut',
             'data' => [
@@ -263,14 +324,24 @@ class TicketController extends Controller
 
         $ticket->update([
             'status_id' => 5,
-            'closed_at' => now() 
+            'closed_at' => now()
         ]);
 
-        if($ticket->asset_id){
+        if ($ticket->asset_id) {
             $asset = $ticket->asset;
             $asset->update([
                 'status_id' => 2
             ]);
+        }
+
+        $user = User::where('id', $ticket->handler_id)->first();
+
+        if ($user->fcm_token != null) {
+            $user->notify(new SendNotification(
+                'Tiket ' . $ticket->id . ' ditutup',
+                'Tiket sudah ditutup oleh user bersangkutan',
+                'ticket'
+            ));
         }
 
         return response()->json([

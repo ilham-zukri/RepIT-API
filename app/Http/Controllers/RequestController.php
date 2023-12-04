@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\RequestListResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Request as AssetRequest;
+use App\Notifications\SendNotification;
+use App\Http\Resources\RequestListResource;
 
 class RequestController extends Controller
 {
@@ -31,6 +32,16 @@ class RequestController extends Controller
             'location_id' => $user->branch_id,
         ]);
 
+        $user = User::where('role_id', 5)->first();
+
+        if ($user->fcm_token != null) {
+            $user->notify(new SendNotification(
+                'Permintaan Asset baru',
+                'Ada permintaan asset baru, segera tindak lanjuti',
+                'request'
+            ));
+        }
+
         return response()->json(['message' => 'Berhasil Membuat Request'], 201);
     }
 
@@ -47,6 +58,24 @@ class RequestController extends Controller
             'status_id' => $statusId,
             'approved_at' => date('Y-m-d')
         ]);
+
+        $user = User::where('id', $assetRequest->requester_id)->first();
+        if ($user->fcm_token != null) {
+            $user->notify(new SendNotification(
+                'Permintaan Asset Disetujui',
+                'Permintaan Asset anda telah disetujui',
+                'request'
+            ));
+        }
+
+        $it = User::where('role_id', 4)->first();
+        if ($it->fcm_token != null) {
+            $it->notify(new SendNotification(
+                'Permintaan Asset Disetujui',
+                'Ada permintaan asset disetujui, segera tindak lanjuti',
+                'request'
+            ));
+        }
 
         return response()->json(
             [
@@ -68,7 +97,7 @@ class RequestController extends Controller
 
             return RequestListResource::collection($assetRequests);
         }
-        
+
 
         if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
 
@@ -97,7 +126,8 @@ class RequestController extends Controller
     }
 
     // for Supervisor, giving only the requests they made
-    public function getMyRequests() {
+    public function getMyRequests()
+    {
         $assetRequests = AssetRequest::whereRequesterId(auth()->user()->id)->orderBy('status_id', 'asc')->orderBy('priority_id', "asc")->paginate(10);
         if (!$assetRequests->first()) return response()->json(['message' => 'Data tidak ditemukan'], 404);
         return RequestListResource::collection($assetRequests);

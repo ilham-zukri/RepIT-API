@@ -11,8 +11,15 @@ use NotificationChannels\Fcm\Resources\Notification as FcmNotification;
 class SendNotification extends Notification
 {
     use Queueable;
+    private $title;
+    private $body;
+    private $type;
 
-
+    public function __construct($title, $body, $type){
+        $this->title = $title;
+        $this->body = $body;
+        $this->type = $type;
+    }
     /**
      * Create a new notification instance.
      */
@@ -26,8 +33,8 @@ class SendNotification extends Notification
         return FcmMessage::create()
             ->setNotification(
                 FcmNotification::create()
-                    ->setTitle("Test From Laravel")
-                    ->setBody("Hello from Laravel")
-            );
+                    ->setTitle($this->title)
+                    ->setBody($this->body)
+            )->setData(['type' => $this->type]);
     }
 }

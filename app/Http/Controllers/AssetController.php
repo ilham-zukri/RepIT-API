@@ -148,6 +148,15 @@ class AssetController extends Controller
                     'status_id' => 4
                 ]
             );
+
+            $user = User::find($asset->owner_id);
+            if ($user->fcm_token != null) {
+                $user->notify(new SendNotification(
+                    'Asset siap diterima',
+                    'Segera cek dan terima asset',
+                    'ticket'
+                ));
+            }
         }
         return response()->json(['message' => 'Data Aset Telah Dibuat'], 201);
     }
@@ -292,12 +301,6 @@ class AssetController extends Controller
         } else {
             $usersWithMatchingDepartment = User::where('department', auth()->user()->department)->pluck('id');
             $assets = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment)->paginate(10);
-        }
-
-        $users = User::where('fcm_token', '!=', null)->get();
-
-        foreach ($users as $user) {
-            $user->notify(new SendNotification);
         }
 
         return AssetResource::collection($assets);
