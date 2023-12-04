@@ -15,13 +15,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-Route::get('/purchase-document', function () {
-    $pdf = Pdf::loadView('purchase_document')->setPaper('a5', 'landscape');
-    return $pdf->download('masa_iya.pdf');
-});
-
-Route::get('/pdf', [PurchaseController::class, 'testPdf']);
