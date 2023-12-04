@@ -29,7 +29,7 @@ class TicketResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'category' => $this->category,
-            'handler' => $this->handler->full_name ?? "#N/A",
+            'handler' => $this->handler->full_name ?? null  ,
             'status' => $this->status->status,
             'flag' => $this->flag ? $this->flag->flag : null,
             'created_at' => $this->created_at->format('d/m/Y | H:i'), //replace m with F if you want to use named month

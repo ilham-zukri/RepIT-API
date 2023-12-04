@@ -28,8 +28,8 @@ class CheckTicketResolveTime extends Command
      */
     public function handle()
     {
+        $date = now()->format('m/d/Y H:i');
         $priorities = Priority::all();
-
         foreach ($priorities as $priority) {
             $tickets = Ticket::where('status_id', '<>', 5)
                 ->where('priority_id', $priority->id)
@@ -38,11 +38,11 @@ class CheckTicketResolveTime extends Command
                 ->get();
 
                 foreach ($tickets as $ticket) {
-                    // Update flag_id for tickets exceeding response time
+                    // Update flag_id for tickets exceeding resolve time
                     $ticket->update(['flag_id' => 2]);
                 }
         }
         
-        $this->info('Resolve time check completed.');
+        $this->info('Resolve time check completed.' . '|' . $date);
     }
 }

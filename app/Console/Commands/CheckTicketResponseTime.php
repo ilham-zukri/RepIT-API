@@ -28,6 +28,7 @@ class CheckTicketResponseTime extends Command
      */
     public function handle()
     {
+        $date = now()->format('m/d/Y H:i');
         $priorities = Priority::all();
         foreach ($priorities as $priority) {
             $tickets = Ticket::where('status_id', '<>', 5)
@@ -42,7 +43,7 @@ class CheckTicketResponseTime extends Command
             }
         }
 
-        $this->info('Response time check completed.');
+        $this->info('Response time check completed.' . '|' . $date);
     }
     
 }
