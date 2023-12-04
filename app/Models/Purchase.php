@@ -73,4 +73,14 @@ class Purchase extends Model
     {
         return $this->belongsTo(PurchaseType::class, 'type_id', 'id');
     }
+
+    /**
+     * Get all of the pictures for the Purchase
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pictures(): HasMany
+    {
+        return $this->hasMany(PurchasePicture::class, 'purchase_id', 'id');
+    }
 }
