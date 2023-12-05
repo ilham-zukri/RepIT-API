@@ -95,6 +95,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/ticket/hold', [TicketController::class, 'holdTicket']);
     Route::put('/ticket/ToBeReviewed', [TicketController::class, 'ToBeReviewedTicket']);
     Route::put('/ticket/close', [TicketController::class, 'closeTicket']);
+    Route::put('/ticket/reject', [TicketController::class, 'rejectTicket']);
 
     Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::get('/priorities', [PriorityController::class, 'getPriorities']);

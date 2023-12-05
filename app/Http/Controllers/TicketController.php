@@ -51,16 +51,16 @@ class TicketController extends Controller
             }
         }
 
-        $itsQ =User::where('role_id', 4)->orWhere('role_id',5);
+        $itsQ = User::where('role_id', 4)->orWhere('role_id', 5);
 
-        if($ticket->ticket_category_id == 2){
+        if ($ticket->ticket_category_id == 2) {
             $itsQ = User::where('role_id', 5);
         }
 
         $its = $itsQ->get();
-        
+
         foreach ($its as $it) {
-            if($it->fcm_token != null){
+            if ($it->fcm_token != null) {
                 $it->notify(new SendNotification(
                     'Tiket Baru',
                     'Tiket baru dibuat oleh ' . auth()->user()->full_name . ' dengan prioritas ' . $ticket->priority->priority,
@@ -174,8 +174,6 @@ class TicketController extends Controller
                 'status' => $ticket->status->status
             ]
         ], 200);
-
-        
     }
 
     public function progressTicket(Request $request)
@@ -350,5 +348,40 @@ class TicketController extends Controller
                 'status' => $ticket->status->status
             ]
         ], 200);
+    }
+
+    public function rejectTicket(Request $request)
+    {
+        $request->validate([
+            'ticket_id' => 'required|integer'
+        ]);
+
+        $ticket = Ticket::find($request->ticket_id);
+        if(!$ticket) return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+        $ticketMakerId = $ticket->created_by_id;
+        $userId = auth()->user()->id;
+
+        if($ticketMakerId != $userId) return response()->json(['message' => 'Forbidden'], 403);
+
+        $ticket->update([
+            'status_id' => 3
+        ]);
+
+        $it = User::find($ticket->handler_id);
+
+        if($it->fcm_token != null) {
+            $it->notify(new SendNotification(
+                "Penyelesaian Tiket {$ticket->id} ditolak",
+                'Penyelesaian tiket ditolak, segera tinjau  kembali pengerjaan ticket anda ' . auth()->user()->full_name,
+                'ticket'
+            ));
+        }
+
+        return response()->json([
+            'message' => 'Tiket berhasil ditolak, pengerjaan akan dilanjutkan',
+            'data' => [
+                'status' => $ticket->status->status
+            ]
+        ]);
     }
 }
