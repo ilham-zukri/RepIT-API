@@ -11,6 +11,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\AssetTypeController;
 use App\Http\Controllers\SparePartController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\SparePartTypeController;
 use App\Http\Controllers\TicketCategoryController;
 use App\Http\Controllers\SparePartRequestController;
@@ -97,8 +98,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/ticket/close', [TicketController::class, 'closeTicket']);
     Route::put('/ticket/reject', [TicketController::class, 'rejectTicket']);
 
-    Route::get('/locations', [LocationController::class, 'getLocations']);
+    Route::get('/performances', [PerformanceController::class, 'getPerformances']);
+
     Route::get('/priorities', [PriorityController::class, 'getPriorities']);
+    Route::put('/priority', [PriorityController::class, 'updatePriority']);
+
+    Route::get('/locations', [LocationController::class, 'getLocations']);
     Route::get('/departments', [DepartmentController::class, 'getDepartmentsForList']);
     Route::get('/ticket-categories', [TicketCategoryController::class, 'getCategories']);
 });
