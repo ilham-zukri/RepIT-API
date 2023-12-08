@@ -56,7 +56,7 @@ class AssetController extends Controller
                 'name' => $name
             ]);
 
-            $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .1)->margin(0)->size(300)->generate($asset->qr_code);
+            $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .2)->margin(0)->size(300)->generate($asset->qr_code);
 
             // Simpan QR Code di direktori publik
             $qrCodePath = 'public/qrcodes/' . $asset->qr_code . '.png';
@@ -126,7 +126,7 @@ class AssetController extends Controller
                     'name' => $name
                 ]);
 
-                $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .1)->margin(0)->size(300)->generate($asset->qr_code);
+                $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .2)->margin(0)->size(300)->generate($asset->qr_code);
 
                 // Simpan QR Code di direktori publik
                 $qrCodePath = 'public/qrcodes/' . $asset->qr_code . '.png';
