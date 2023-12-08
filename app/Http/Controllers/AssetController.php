@@ -295,15 +295,23 @@ class AssetController extends Controller
     {
         $access = auth()->user()->role->asset_management || auth()->user()->role->asset_request;
         if (!$access) return response()->json(['message' => 'tidak berwenang'], 200);
-
+        $searchParam = $request->query('search_param');
         if (auth()->user()->role->asset_management) {
-            $assets = Asset::orderBy('status_id', 'asc')->paginate(10);
-        } else {
+            $assetsQ = Asset::orderBy('status_id', 'asc');
+            if ($searchParam) {
+                $assetsQ = Asset::search($searchParam);
+            }
+            $assets = $assetsQ->paginate(10);
+            return AssetResource::collection($assets);
+                } else {
             $usersWithMatchingDepartment = User::where('department', auth()->user()->department)->pluck('id');
-            $assets = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment)->paginate(10);
+            $assetsQ = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment);
+            if ($searchParam) {
+                $assetsQ = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment)->search($searchParam);
+            }
+            $assets = $assetsQ->paginate(10);
+            return AssetResource::collection($assets);
         }
-
-        return AssetResource::collection($assets);
     }
 
     function getAssetTicketHistory(Request $request)
@@ -338,7 +346,7 @@ class AssetController extends Controller
         $qrCode = $request->query('qr_code');
 
         $asset = Asset::where('qr_code', $qrCode)->first();
-        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);  
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
 
         return new AssetResource($asset);
     }

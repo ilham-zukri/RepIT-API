@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Scout\Searchable;
 
 class Asset extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $fillable = [
         'owner_id',
@@ -29,6 +30,14 @@ class Asset extends Model
         'purchase_id',
         'scrapped_at',
     ];
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'name' => '',
+            'id' => '',
+        ];
+    }
 
     /**
      * Get the user that owns the Asset
