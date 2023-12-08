@@ -255,7 +255,7 @@ class AssetController extends Controller
             'owner_id' => $user->id,
             'location_id' => $user->branch_id,
             'utilization' => $request->utilization,
-            'status_id' => 2,   
+            'status_id' => 2,
             'deployed_at' => now()
         ]);
 
@@ -287,8 +287,8 @@ class AssetController extends Controller
             'message' => 'Berhasil mengambil asset sebagai cadangan',
             'data' => [
                 'status' => $asset->status->status
-                ]
-        ], 200);    
+            ]
+        ], 200);
     }
 
     public function getAllAssets(Request $request)
@@ -335,11 +335,10 @@ class AssetController extends Controller
 
     public function getAssetByQRCode(Request $request)
     {
-        $request->validate([
-            'qr_code' => 'required|string'
-        ]);
+        $qrCode = $request->query('qr_code');
 
-        $asset = Asset::where('qr_code', $request->qr_code)->first();
+        $asset = Asset::where('qr_code', $qrCode)->first();
+        if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);  
 
         return new AssetResource($asset);
     }
