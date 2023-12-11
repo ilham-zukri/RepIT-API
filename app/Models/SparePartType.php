@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SparePartType extends Model
 {
@@ -12,4 +13,14 @@ class SparePartType extends Model
     public $timestamps = false;
 
     protected $guarded =[];
+
+    /**
+     * Get all of the spareParts for the SparePartType
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function spareParts(): HasMany
+    {
+        return $this->hasMany(SparePart::class, 'type_id', 'id');
+    }
 }
