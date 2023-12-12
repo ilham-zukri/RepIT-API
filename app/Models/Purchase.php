@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Purchase extends Model
 {
@@ -79,8 +80,8 @@ class Purchase extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function pictures(): HasMany
+    public function picture(): HasOne
     {
-        return $this->hasMany(PurchasePicture::class, 'purchase_id', 'id');
+        return $this->hasOne(PurchasePicture::class, 'purchase_id', 'id');
     }
 }

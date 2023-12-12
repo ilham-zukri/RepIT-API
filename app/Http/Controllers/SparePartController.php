@@ -23,16 +23,17 @@ class SparePartController extends Controller
         if (!$access) return response()->json(['message' => 'Tidak Berwenang'], 403);
 
         if (!$request->purchase_id) {
+
             $request->validate([
                 'type_id' => 'required|integer',
                 'brand' => 'required|string',
-                'model' => 'required|model',
+                'model' => 'required|string',
                 'serial_number' => 'required|string',
             ]);
 
             $sparePartData = $request->all();
             $qrUuid = Str::uuid();
-            $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .3)->margin(0)->size(300)->generate($qrUuid);
+            $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .2)->margin(0)->size(300)->generate($qrUuid);
             $qrCodePath = 'public/qrcodes/' . $qrUuid . '.png';
             Storage::put($qrCodePath, $qrCode);
 
@@ -87,7 +88,7 @@ class SparePartController extends Controller
 
             foreach ($items as $item) {
                 $qrUuid = Str::uuid();
-                $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .3)->margin(0)->size(300)->generate($qrUuid);
+                $qrCode = QrCode::format('png')->merge('/storage/app/img/sabar.jpg', .2)->margin(0)->size(300)->generate($qrUuid);
                 $qrCodePath = 'public/qrcodes/' . $qrUuid . '.png';
                 Storage::put($qrCodePath, $qrCode);
                 $qrCodeUrl = Storage::url($qrCodePath);
@@ -129,7 +130,7 @@ class SparePartController extends Controller
             $query->where('status_id', $statusId);
         }
 
-        $spareParts = $query->paginate(10);
+        $spareParts = $query->orderBy('status_id', 'asc')->paginate(10);
 
         if ($spareParts->isEmpty()) return response()->json(['message' => 'Data Spare Part Tidak Ditemukan'], 404);
 

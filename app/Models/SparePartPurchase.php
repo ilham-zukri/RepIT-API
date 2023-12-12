@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -60,5 +61,15 @@ class SparePartPurchase extends Model
     public function spareParts(): HasMany
     {
         return $this->hasMany(SparePart::class, 'purchase_id', 'id');
+    }
+
+    /**
+     * Get the picture associated with the SparePartPurchase
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function picture(): HasOne
+    {
+        return $this->hasOne(SparePartPurchasePicture::class, 'purchase_id', 'id');
     }
 }

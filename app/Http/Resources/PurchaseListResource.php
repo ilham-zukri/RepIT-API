@@ -21,6 +21,7 @@ class PurchaseListResource extends JsonResource
             "purchased_by"=> $this->buyer->full_name ?? $this->buyer->user_name,
             "purchased_from"=> $this->purchased_from,
             "doc_path" => $this->doc_path,
+            "pic_path" => $this->picture ? $this->picture->url : null,
             "items" => $this->items,
             "total_price"=> $this->total_price,
             "status"=> $this->status->status,

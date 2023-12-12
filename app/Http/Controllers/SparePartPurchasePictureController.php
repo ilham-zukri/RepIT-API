@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Purchase;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\SparePartPurchase;
+use App\Models\SparePartPurchasePicture;
 
-class PurchasePictureController extends Controller
+class SparePartPurchasePictureController extends Controller
 {
     public function uploadPicture(Request $request){
         $access = auth()->user()->role->asset_management;
@@ -17,7 +18,7 @@ class PurchasePictureController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg|max:6144'
         ]);
 
-        $purchase = Purchase::find($request->purchase_id);
+        $purchase = SparePartPurchase::find($request->purchase_id);
         if (!$purchase) return response()->json(['message' => 'Pembelian tidak ditemukan'], 404);
 
         $image = $request->file('image');
