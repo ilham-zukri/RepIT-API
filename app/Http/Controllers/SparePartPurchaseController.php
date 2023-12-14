@@ -83,15 +83,20 @@ class SparePartPurchaseController extends Controller
         return response()->json(['message' => 'Berhasil Terbuat'], 201);
     }
 
-    public function getPurchases()
+    public function getPurchases(Request $request)
     {
         $user = User::where('id', auth()->user()->id)->first();
         $access = $user->role->asset_purchasing;
         if (!$access) return response()->json(['message' => 'forbidden'], 403);
 
-        $purchases = SparePartPurchase::orderBy('status_id', 'asc')
-            ->orderBy('created_at', 'asc')
-            ->paginate(10);
+        $purchasesQ = SparePartPurchase::orderBy('status_id', 'asc')
+            ->orderBy('created_at', 'asc');
+
+        if($request->query('search_param')){
+            $purchasesQ = SparePartPurchase::search($request->query('search_param'));
+        }
+
+        $purchases = $purchasesQ->paginate(10);
 
         return SparePartPurchaseResource::collection($purchases);
     }

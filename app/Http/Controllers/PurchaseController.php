@@ -93,13 +93,18 @@ class PurchaseController extends Controller
         return response()->json(['message' => 'Berhasil Terbuat'], 201);
     }
 
-    public function getPurchases()
+    public function getPurchases(Request $request)
     {
         $access = (auth()->user()->role->asset_approval || auth()->user()->role->asset_purchasing);
         if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
-        $purchases = Purchase::orderBy('status_id', 'asc')
-            ->orderBy('created_at', 'asc')
-            ->paginate(10);
+        $purchasesQ = Purchase::orderBy('status_id', 'asc')
+            ->orderBy('created_at', 'asc');
+
+        if($request->query('search_param')){
+            $purchasesQ = Purchase::search($request->query('search_param'));
+        }
+        
+        $purchases = $purchasesQ->paginate(10);
 
         return PurchaseListResource::collection($purchases);
     }

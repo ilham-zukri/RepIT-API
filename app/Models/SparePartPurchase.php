@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Scout\Searchable;
 
 class SparePartPurchase extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
     protected $guarded = [];
 
     /**
@@ -71,5 +72,12 @@ class SparePartPurchase extends Model
     public function picture(): HasOne
     {
         return $this->hasOne(SparePartPurchasePicture::class, 'purchase_id', 'id');
+    }
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => '',
+            'purchased_from' => ''
+        ];
     }
 }

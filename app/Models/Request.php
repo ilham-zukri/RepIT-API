@@ -6,21 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use \Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Scout\Searchable;
 
 class Request extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
 
-    protected $fillable =[
-        'requester_id',
-        'status_id',
-        'title',
-        'description',
-        'priority_id',
-        'for_user',
-        'location_id',
-        'approved_at'
-    ];
+    // protected $fillable =[
+    //     'requester_id',
+    //     'status_id',
+    //     'title',
+    //     'description',
+    //     'priority_id',
+    //     'for_user',
+    //     'location_id',
+    //     'approved_at'
+    // ];
+
+    protected $guarded = [];
 
     /**
      * Get the requester that owns the Request
@@ -80,5 +83,11 @@ class Request extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(RequestStatus::class, 'status_id', 'id');
+    }
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => ''
+        ];
     }
 }

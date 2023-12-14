@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Scout\Searchable;
 
 class SparePartRequest extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
     protected $guarded = [];
 
     /**
@@ -47,4 +48,10 @@ class SparePartRequest extends Model
         'approved_at' => 'datetime',
         'created_at' => 'datetime',
     ];  
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => ''
+        ];
+    }
 }

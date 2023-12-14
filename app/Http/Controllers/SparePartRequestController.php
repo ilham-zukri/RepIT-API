@@ -28,22 +28,36 @@ class SparePartRequestController extends Controller
         ], 201);
     }
 
-    public function getSparepartRequests()
+    public function getSparepartRequests(Request $request)
     {
         $access = auth()->user()->role->asset_management;
         if (!$access) return response()->json(['message' => 'forbidden'], 403);
-        
+
         $sparePartRequestsQ = SparePartRequest::orderBy('status_id', 'asc')->orderBy('created_at', 'asc');
+        if ($request->query('search_param')) {
+            $sparePartRequestsQ = SparePartRequest::search($request->query('search_param'));
+        }
 
         if (!auth()->user()->role->asset_approval) {
             $sparePartRequestsQ = SparePartRequest::where('status_id', '>', 1)
                 ->orderBy('status_id', 'asc')
                 ->orderBy('created_at', 'asc');
+            
+            if ($request->query('search_param')) {
+                $sparePartRequestsQ = SparePartRequest::search($request->query('search_param'));
+                $requestS = $sparePartRequestsQ->first();
+                if($requestS->status_id == 1){
+                    return response()->json(['message' => 'data tidak ditemukan '], 404);
+                }
+            }
+            $sparePartRequests = $sparePartRequestsQ->paginate(10);
+            return SparePartRequestResource::collection($sparePartRequests);
         }
 
-        $sparePartRequests = $sparePartRequestsQ->paginate(10);
 
+        $sparePartRequests = $sparePartRequestsQ->paginate(10);
         return SparePartRequestResource::collection($sparePartRequests);
+
     }
 
     public function approveSparepartRequest(Request $request): JsonResponse
