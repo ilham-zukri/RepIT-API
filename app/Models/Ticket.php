@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Laravel\Scout\Searchable;
 
 class Ticket extends Model
 {
-    use HasFactory;
+    use HasFactory, Searchable;
     protected $guarded =[];
 
     /**
@@ -101,6 +102,13 @@ class Ticket extends Model
     public function flag(): BelongsTo
     {
         return $this->belongsTo(Flag::class, 'flag_id', 'id');
+    }
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => '',
+            'asset_id' => ''
+        ];
     }
 
     protected $casts = [
