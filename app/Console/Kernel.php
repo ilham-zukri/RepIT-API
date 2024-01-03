@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('tickets:check-ticket-response-time')->everyFiveMinutes()->appendOutputTo(storage_path('logs/scheduler.log')); 
         $schedule->command('tickets:check-ticket-resolve-time')->hourly()->appendOutputTo(storage_path('logs/scheduler.log'));
         $schedule->command('sla:calculation')->monthly()->appendOutputTo(storage_path('logs/scheduler.log'));
+        $schedule->command('tickets:force-close')->hourly()->appendOutputTo(storage_path('logs/scheduler.log'));
     }
 
     /**
