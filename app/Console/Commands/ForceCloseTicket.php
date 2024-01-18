@@ -27,8 +27,7 @@ class ForceCloseTicket extends Command
      */
     public function handle()
     {
-        $tickets = Ticket::where('status_id', 4)
-        ->where('resolved_at', '>',Carbon::now()->subHours(2))->get();
+        $tickets = Ticket::where('status_id', 4)->get();
 
         foreach($tickets as $ticket) {
             $ticket->update(['status_id' => 5]);
