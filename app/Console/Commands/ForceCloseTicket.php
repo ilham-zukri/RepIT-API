@@ -32,6 +32,9 @@ class ForceCloseTicket extends Command
 
         foreach($tickets as $ticket) {
             $ticket->update(['status_id' => 5]);
+            if($ticket->asset_id){
+                $ticket->asset()->update(['status_id' => 2]);
+            }
         }
 
         $this->info('Auto close tickets completed');
