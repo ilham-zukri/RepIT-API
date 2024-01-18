@@ -30,6 +30,7 @@ class ForceCloseTicket extends Command
         $tickets = Ticket::where('status_id', 4)->get();
 
         foreach($tickets as $ticket) {
+            if(Carbon::parse($ticket->resolved_at)->diffInHours(Carbon::now()) < 2) continue;
             $ticket->update(['status_id' => 5]);
             if($ticket->asset_id){
                 $ticket->asset()->update(['status_id' => 2]);
