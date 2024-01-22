@@ -103,6 +103,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/ticket/reject', [TicketController::class, 'rejectTicket']);
 
     Route::post('/tickets/export-report', [TicketController::class, 'exportTicketsReport']);
+    Route::post('/assets/export-report', [AssetController::class, 'exportAssetsReport']);
 
     Route::get('/performances', [PerformanceController::class, 'getPerformances']);
 

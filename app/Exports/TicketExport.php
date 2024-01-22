@@ -73,10 +73,10 @@ class TicketExport implements FromCollection, WithHeadings, WithMapping
             'Prioritas',
             'Aset',
             'Status',
-            'Dibuat Pada',
-            'Direspon Pada',
+            'Waktu Dibuat',
+            'Waktu Direspon',
             'Kategori Tiket',
-            'Terselesaikan Pada',
+            'Waktu Penyelesaian',
             'Memenuhi SLA'
         ];
     }

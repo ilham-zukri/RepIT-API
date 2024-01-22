@@ -403,6 +403,6 @@ class TicketController extends Controller
 
         Excel::store(new TicketExport($request->month), $path, 'real_public');
 
-       return response()->json(['message' => 'Berhasil', 'path' => $path], 200);
+       return response()->json(['message' => 'Berhasil', 'path' => $path], 201);
     }
 }

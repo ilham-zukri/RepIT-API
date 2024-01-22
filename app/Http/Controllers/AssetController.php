@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Asset;
 use App\Models\Purchase;
 use App\Models\AssetType;
 use Illuminate\Support\Str;
+use App\Exports\AssetExport;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\AssetResource;
 use App\Http\Resources\TicketResource;
+use App\Notifications\SendNotification;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Resources\SparePartResource;
-use App\Notifications\SendNotification;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class AssetController extends Controller
@@ -303,7 +306,7 @@ class AssetController extends Controller
             }
             $assets = $assetsQ->paginate(10);
             return AssetResource::collection($assets);
-                } else {
+        } else {
             $usersWithMatchingDepartment = User::where('department', auth()->user()->department)->pluck('id');
             $assetsQ = Asset::where('location_id', auth()->user()->branch_id)->whereIn('owner_id', $usersWithMatchingDepartment);
             if ($searchParam) {
@@ -349,5 +352,19 @@ class AssetController extends Controller
         if (!$asset) return response()->json(['message' => 'Asset tidak ditemukan'], 404);
 
         return new AssetResource($asset);
+    }
+
+    public function exportAssetsReport(Request $request)
+    {
+        $request->validate([
+            'location_id' => 'integer'
+        ]);
+
+        $date = Carbon::now()->format('d-m-Y');
+        $path = ($request->location_id) ? 'reports/' . $date . '_assets_' . $request->location_id . '.xlsx' : 'reports/' . $date . '_assets.xlsx';
+
+        Excel::store(new AssetExport($request->location_id), $path, 'real_public');
+
+        return response()->json(['message' => 'berhasil', 'path' => $path], 201);
     }
 }
