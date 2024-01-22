@@ -8,8 +8,10 @@ use App\Models\User;
 use App\Models\Asset;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
+use App\Exports\PurchaseExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\AssetResource;
 use App\Models\Request as AssetRequest;
 use Illuminate\Support\Facades\Storage;
@@ -175,5 +177,19 @@ class PurchaseController extends Controller
         if (!$assets->first()) return response()->json(['message' => 'Belum ada asset yang diterima'], 404);
 
         return AssetResource::collection($assets);
+    }
+
+    public function exportPurchasesReport(Request $request)
+    {
+        $request->validate([
+            'month' => 'required|date_format:Y-m'
+        ]);
+
+        $date = Carbon::now()->format('d-m-Y');
+        $path = 'reports/'.$date.'_purchases_' . $request->month . '.xlsx';
+
+        Excel::store(new PurchaseExport($request->month), $path, 'real_public');
+
+       return response()->json(['message' => 'Berhasil', 'path' => $path], 201);
     }
 }

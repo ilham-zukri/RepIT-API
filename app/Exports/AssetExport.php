@@ -47,11 +47,11 @@ class AssetExport implements FromCollection, WithHeadings, WithMapping
             'RAM' => $asset->ram,
             'Penggunaan' => $asset->utilization,
             'Lokasi' => $asset->location->name,
-            'Tanggal Dibuat' => $asset->created_at,
-            'Tanggal Diterima' => $asset->deployed_at,
+            'Tanggal Dibuat' => $asset->created_at->format('d-m-Y | H:i y'),
+            'Tanggal Diterima' => $asset->deployed_at->format('d-m-Y | H:i y'),
             'status' => $asset->status->status,
             'No. Pembelian' => $asset->purchase_id,
-            'Tanggal Dihapus' => $asset->scrapped_at,
+            'Tanggal Dihapus' => $asset->scrapped_at ? $asset->scrapped_at->format('d-m-Y | H:i y') : null,
             'Jumlah Tiket Terbuat' => $asset->ticket_count ?? 0
         ];
     }

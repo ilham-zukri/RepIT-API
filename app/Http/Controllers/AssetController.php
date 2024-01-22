@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Asset;
+use App\Models\Location;
 use App\Models\Purchase;
 use App\Models\AssetType;
 use Illuminate\Support\Str;
@@ -361,7 +362,10 @@ class AssetController extends Controller
         ]);
 
         $date = Carbon::now()->format('d-m-Y');
-        $path = ($request->location_id) ? 'reports/' . $date . '_assets_' . $request->location_id . '.xlsx' : 'reports/' . $date . '_assets.xlsx';
+
+        $location = Location::where('id', $request->location_id)->pluck('name')->first();
+
+        $path = ($request->location_id) ? 'reports/' . $date . '_assets_' . $location . '.xlsx' : 'reports/' . $date . '_assets.xlsx';
 
         Excel::store(new AssetExport($request->location_id), $path, 'real_public');
 
