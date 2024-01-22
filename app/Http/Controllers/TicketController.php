@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Asset;
 use App\Models\Ticket;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Exports\TicketExport;
 use Illuminate\Http\JsonResponse;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\TicketResource;
-use App\Models\User;
 use App\Notifications\SendNotification;
 
 class TicketController extends Controller
@@ -387,5 +390,19 @@ class TicketController extends Controller
                 'status' => $ticket->status->status
             ]
         ]);
+    }
+
+    public function exportTicketsReport(Request $request)
+    {
+        $request->validate([
+            'month' => 'required|date_format:Y-m'
+        ]);
+
+        $date = Carbon::now()->format('d-m-Y');
+        $path = 'reports/'.$date.'_tickets_' . $request->month . '.xlsx';
+
+        Excel::store(new TicketExport($request->month), $path, 'real_public');
+
+       return response()->json(['message' => 'Berhasil', 'path' => $path], 200);
     }
 }
