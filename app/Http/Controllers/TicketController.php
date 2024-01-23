@@ -397,11 +397,18 @@ class TicketController extends Controller
         $request->validate([
             'month' => 'required|date_format:Y-m'
         ]);
+        
+        $tickets = Ticket::select('created_by_id', 'handler_id', 'title', 'description', 'priority_id', 'asset_id', 'status_id', 'created_at','responded_at', 'ticket_category_id', 'resolved_at')
+            ->whereYear('created_at', Carbon::parse($request->month)->year)
+            ->whereMonth('created_at', Carbon::parse($request->month)->month)
+            ->get();
+
+        if (!$tickets->first()) return response()->json(['message' => 'Belum ada data'], 404);
 
         $date = Carbon::now()->format('d-m-Y');
         $path = 'reports/'.$date.'_tickets_' . $request->month . '.xlsx';
 
-        Excel::store(new TicketExport($request->month), $path, 'real_public');
+        Excel::store(new TicketExport($tickets), $path, 'real_public');
 
        return response()->json(['message' => 'Berhasil', 'path' => $path], 201);
     }

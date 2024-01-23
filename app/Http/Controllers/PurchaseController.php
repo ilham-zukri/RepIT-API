@@ -185,10 +185,17 @@ class PurchaseController extends Controller
             'month' => 'required|date_format:Y-m'
         ]);
 
+        $purchases = Purchase::select('request_id', 'purchased_by', 'purchased_from', 'total_price', 'status_id', 'description', 'created_at')
+            ->whereYear('created_at', Carbon::parse($request->month)->year)
+            ->whereMonth('created_at', Carbon::parse($request->month)->month)
+            ->get();
+        
+        if (!$purchases->first()) return response()->json(['message' => 'Belum ada data'], 404);
+
         $date = Carbon::now()->format('d-m-Y');
         $path = 'reports/'.$date.'_purchases_' . $request->month . '.xlsx';
 
-        Excel::store(new PurchaseExport($request->month), $path, 'real_public');
+        Excel::store(new PurchaseExport($purchases), $path, 'real_public');
 
        return response()->json(['message' => 'Berhasil', 'path' => $path], 201);
     }

@@ -14,16 +14,13 @@ class PurchaseExport implements FromCollection, WithMapping, WithHeadings
     * @return \Illuminate\Support\Collection
     */
 
-    private $month;
-    public function __construct($month) {
-        $this->month = $month;
+    private $purchases;
+    public function __construct($purchases) {
+        $this->purchases = $purchases;
     }
     public function collection()
     {
-        $purchases = Purchase::select('request_id', 'purchased_by', 'purchased_from', 'total_price', 'status_id', 'description', 'created_at')
-            ->whereYear('created_at', Carbon::parse($this->month)->year)
-            ->whereMonth('created_at', Carbon::parse($this->month)->month)
-            ->get();
+        $purchases = $this->purchases;
         
         return $purchases;
     }

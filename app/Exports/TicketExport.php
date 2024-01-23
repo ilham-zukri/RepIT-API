@@ -10,20 +10,15 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class TicketExport implements FromCollection, WithHeadings, WithMapping
 {
-    private $date;
-    /**
-     * @return \Illuminate\Support\Collection
-     */
-    public function __construct(String $date)
+    private $tickets;
+
+    public function __construct($tickets)
     {
-        $this->date = $date;
+        $this->tickets = $tickets;
     }
     public function collection()
     {
-        $tickets = Ticket::select('created_by_id', 'handler_id', 'title', 'description', 'priority_id', 'asset_id', 'status_id', 'created_at','responded_at', 'ticket_category_id', 'resolved_at')
-            ->whereYear('created_at', Carbon::parse($this->date)->year)
-            ->whereMonth('created_at', Carbon::parse($this->date)->month)
-            ->get();
+        $tickets = $this->tickets;
 
             foreach ($tickets as $ticket) {
                 $createdAt = $ticket->created_at;
