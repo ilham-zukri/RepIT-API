@@ -358,8 +358,12 @@ class AssetController extends Controller
     public function exportAssetsReport(Request $request)
     {
         $request->validate([
-            'location_id' => 'integer'
+            'location_id' => 'integer|nullable'
         ]);
+
+        $access = auth()->user()->role->asset_management;
+
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
 
         $date = Carbon::now()->format('d-m-Y');
 

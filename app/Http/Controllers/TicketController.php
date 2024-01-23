@@ -397,6 +397,10 @@ class TicketController extends Controller
         $request->validate([
             'month' => 'required|date_format:Y-m'
         ]);
+
+        $access = auth()->user()->role->asset_management;
+
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
         
         $tickets = Ticket::select('created_by_id', 'handler_id', 'title', 'description', 'priority_id', 'asset_id', 'status_id', 'created_at','responded_at', 'ticket_category_id', 'resolved_at')
             ->whereYear('created_at', Carbon::parse($request->month)->year)

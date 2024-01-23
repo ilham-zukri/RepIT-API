@@ -185,6 +185,10 @@ class PurchaseController extends Controller
             'month' => 'required|date_format:Y-m'
         ]);
 
+        $access = auth()->user()->role->asset_management;
+
+        if (!$access) return response()->json(['message' => 'Tidak berwenang'], 403);
+
         $purchases = Purchase::select('request_id', 'purchased_by', 'purchased_from', 'total_price', 'status_id', 'description', 'created_at')
             ->whereYear('created_at', Carbon::parse($request->month)->year)
             ->whereMonth('created_at', Carbon::parse($request->month)->month)

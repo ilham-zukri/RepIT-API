@@ -108,4 +108,9 @@ class Asset extends Model
     {
         return $this->hasMany(SparePart::class, 'device_id', 'id');
     }
+
+    protected $casts = [
+        'deployed_at' => 'datetime',
+        'scrapped_at' => 'datetime'
+    ];
 }
