@@ -29,16 +29,17 @@ class SlaCalculation extends Command
     public function handle()
     {
         $recentPeriod = now()->subMonth();
+        $this->info($recentPeriod);
         $recentMonthPeriod = $recentPeriod->format('m');
         $recentYearPeriod = $recentPeriod->format('Y');
 
-        if ($recentMonthPeriod === '01') {
+        if ($recentPeriod->month === '01') {
             $recentPeriod = $recentPeriod->subYear();
             $recentMonthPeriod = '12';
             $recentYearPeriod = $recentPeriod->format('Y');
         }
 
-        $this->info('Last month: ' . $recentMonthPeriod . 'year: ' . $recentYearPeriod);
+        $this->info('Last month: ' . $recentMonthPeriod . ' year: ' . $recentYearPeriod);
 
         $tickets = Ticket::whereMonth('created_at', $recentMonthPeriod)->get();
 
