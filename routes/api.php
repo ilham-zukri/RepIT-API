@@ -36,6 +36,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/user/user-name', [AuthController::class, 'changeUname']);
     Route::put('/user/full-name', [AuthController::class, 'changeFullName']);
     Route::put('/user/email', [AuthController::class, 'changeEmail']);
+    Route::put('/user/employee-id', [AuthController::class, 'changeEmployeeNumber']);
     Route::put('/user/password', [AuthController::class, 'changePassword']);
     Route::put('/user/password/reset', [AuthController::class, 'resetPassword']);
     Route::put('/user/role', [AuthController::class, 'changeRole']);

@@ -32,16 +32,18 @@ class RequestController extends Controller
             'location_id' => $user->branch_id,
         ]);
 
-        $user = User::where('role_id', 5)->first();
+        $users = User::where('role_id', 5)->get();
 
-        if ($user->fcm_token != null) {
-            $user->notify(new SendNotification(
-                'Permintaan Asset baru',
-                'Ada permintaan asset baru, segera tindak lanjuti',
-                'request'
-            ));
+        foreach ($users as $user) {
+            if ($user->fcm_token != null) {
+                $user->notify(new SendNotification(
+                    'Permintaan Asset baru',
+                    'Ada permintaan asset baru, segera tindak lanjuti',
+                    'request'
+                ));
+            };
         }
-
+        
         return response()->json(['message' => 'Berhasil Membuat Request'], 201);
     }
 

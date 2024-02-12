@@ -110,6 +110,27 @@ class AuthController extends Controller
         return response()->json(['message' => 'Berhail Mengganti Email'], 200);
     }
 
+    public function changeEmployeeNumber(Request $request) : JsonResponse {
+        $access = auth()->user()->role->user_management;
+        if (!$access) return response()->json(['message' => 'forbidden'], 403);
+        
+        $request->validate([
+            'user_id' => 'required|string',
+            'employee_id' => 'required|string'
+        ]);
+
+        $user = User::whereId($request->user_id)->firstOrFail();
+
+        $existed = User::whereEmployeeId($request->employee_id)->first();
+        if ($existed) return response()->json(['message' => 'Nomor karyawan sudah terdaftar'], 409);
+
+        $user->update([
+            'employee_id' => $request->employee_id
+        ]);
+
+        return response()->json(['message' => 'Berhail Mengganti Email'], 200);
+    }
+
     public function changePassword(Request $request)
     {
         $access = auth()->user()->role->user_management;
