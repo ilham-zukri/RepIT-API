@@ -168,7 +168,7 @@ class TicketController extends Controller
         if ($user->fcm_token != null) {
             $user->notify(new SendNotification(
                 'Tiket Direspon',
-                'Tiket anda telah direspon oleh' . auth()->user()->full_name,
+                'Tiket anda telah direspon oleh ' . auth()->user()->full_name,
                 'ticket'
             ));
         }

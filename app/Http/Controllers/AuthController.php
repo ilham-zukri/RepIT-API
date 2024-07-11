@@ -120,7 +120,6 @@ class AuthController extends Controller
         ]);
 
         $user = User::whereId($request->user_id)->firstOrFail();
-
         $existed = User::whereEmployeeId($request->employee_id)->first();
         if ($existed) return response()->json(['message' => 'Nomor karyawan sudah terdaftar'], 409);
 
